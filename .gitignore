@@ -3,3 +3,6 @@ result*
 .direnv
 .pre-commit-config.yaml
 target
+
+.tmp
+.s.PGSQL.5432.lock

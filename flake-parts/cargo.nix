@@ -23,6 +23,11 @@
       # version control
       pkgs.cocogitto
       inputs'.bomper.packages.cli
+      # database
+      self'.packages.postgresql
+      self'.packages."scripts/init-database"
+      self'.packages."scripts/start-database"
+      self'.packages."scripts/stop-database"
       # misc
     ];
 
