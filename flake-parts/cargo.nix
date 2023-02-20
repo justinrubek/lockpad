@@ -61,10 +61,10 @@
     packages = {
       default = packages.cli;
       cli = craneLib.buildPackage ({
-          pname = "cli";
+          pname = "lockpad-cli";
           cargoArtifacts = deps-only;
-          cargoExtraArgs = "--bin cli";
-          meta.mainProgram = "cli";
+          cargoExtraArgs = "--bin lockpad-cli";
+          meta.mainProgram = "lockpad-cli";
         }
         // common-build-args);
       cargo-doc = craneLib.cargoDoc ({
