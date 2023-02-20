@@ -12,7 +12,7 @@
     inputs',
     ...
   }: let
-    fenix-channel = inputs'.fenix.packages.latest;
+    fenix-channel = inputs'.fenix.packages.stable;
     fenix-toolchain = fenix-channel.withComponents [
       "rustc"
       "cargo"
