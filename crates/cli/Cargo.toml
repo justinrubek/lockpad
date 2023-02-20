@@ -1,7 +1,11 @@
 [package]
-name = "cli"
+name = "lockpad"
 version = "0.1.0"
 edition = "2021"
+
+[[bin]]
+name = "lockpad-cli"
+path = "src/main.rs"
 
 [dependencies]
 serde_dynamo = { version = "4.0.12", features = ["aws-sdk-dynamodb+0_24"] }
@@ -11,4 +15,7 @@ scylla-dynamodb = { path = "../scylla-dynamodb" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1.0.87"
 aws-sdk-dynamodb = "0.24.0"
+lockpad-http = { path = "../http" }
 tokio = { version = "1", features = ["full"] }
+tracing-subscriber = "0.3.16"
+clap = { version = "4.1.6", features = ["derive"] }

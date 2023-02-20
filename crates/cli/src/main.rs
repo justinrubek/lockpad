@@ -1,59 +1,31 @@
-use serde::{Deserialize, Serialize};
+use crate::commands::{Commands, ServerCommands};
+use clap::Parser;
+use lockpad::{create_table, entity::PrimaryId, models::user::User};
 use serde_dynamo::to_item;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct PrimaryId {
-    pub pk: String,
-    pub sk: String,
-}
+mod commands;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct User {
-    #[serde(flatten)]
-    pub id: PrimaryId,
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tracing_subscriber::fmt::init();
 
-    pub name: String,
-}
+    let args = commands::Args::parse();
+    match args.command {
+        Commands::Server(server) => {
+            let cmd = server.command;
+            let server = lockpad_http::Server::default();
 
-// An opinionated table creation function.
-// Creates a table with composite keys pk and sk
-async fn create_table(
-    client: &aws_sdk_dynamodb::Client,
-    table_name: &str,
-) -> Result<(), aws_sdk_dynamodb::Error> {
-    let primary_key = aws_sdk_dynamodb::model::AttributeDefinition::builder()
-        .attribute_name("pk".to_string())
-        .attribute_type(aws_sdk_dynamodb::model::ScalarAttributeType::S)
-        .build();
-    let sort_key = aws_sdk_dynamodb::model::AttributeDefinition::builder()
-        .attribute_name("sk".to_string())
-        .attribute_type(aws_sdk_dynamodb::model::ScalarAttributeType::S)
-        .build();
-
-    let primary_key_schema = aws_sdk_dynamodb::model::KeySchemaElement::builder()
-        .attribute_name("pk".to_string())
-        .key_type(aws_sdk_dynamodb::model::KeyType::Hash)
-        .build();
-
-    let sort_key_schema = aws_sdk_dynamodb::model::KeySchemaElement::builder()
-        .attribute_name("sk".to_string())
-        .key_type(aws_sdk_dynamodb::model::KeyType::Range)
-        .build();
-
-    client
-        .create_table()
-        .table_name(table_name)
-        .set_attribute_definitions(Some(vec![primary_key, sort_key]))
-        .set_key_schema(Some(vec![primary_key_schema, sort_key_schema]))
-        .billing_mode(aws_sdk_dynamodb::model::BillingMode::PayPerRequest)
-        .send()
-        .await?;
+            match cmd {
+                ServerCommands::Http => server.run().await?,
+            }
+        }
+    }
 
     Ok(())
 }
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[allow(dead_code)]
+async fn create_table_and_user() -> Result<(), Box<dyn std::error::Error>> {
     let client = scylla_dynamodb::connect_dynamodb("http://localhost:8100".to_string()).await;
     create_table(&client, "users").await?;
 
@@ -79,6 +51,5 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let all_items = client.scan().table_name("users").send().await?;
 
     println!("{:?}", all_items);
-
     Ok(())
 }
