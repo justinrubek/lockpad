@@ -33,6 +33,7 @@
         ./flake-parts/rust-toolchain.nix
         ./flake-parts/pre-commit.nix
         ./flake-parts/postgres.nix
+        ./flake-parts/scylla.nix
       ];
     };
 }
