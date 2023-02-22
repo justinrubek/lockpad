@@ -20,8 +20,8 @@ pub(crate) struct AuthorizeResponse {
 }
 
 /// Performs the signup process.
-/// This is where the user's credentials are checked against the database.
-/// If the credentials are valid, a token is generated and sent to the user.
+/// This is where the user's credentials are added to the database.
+/// If the credentials are unique, the acount is created and a token is sent to the user.
 pub(crate) async fn signup(
     dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
     payload: axum::extract::Json<Credentials>,
@@ -95,7 +95,7 @@ pub(crate) async fn authorize(
     match res.count() {
         0 => {
             tracing::debug!("No user found with the given username");
-            return Err(Error::Unauthorized);
+            Err(Error::Unauthorized)
         }
         1 => {
             let user = res.items().unwrap()[0].clone();
@@ -111,16 +111,16 @@ pub(crate) async fn authorize(
                 })?;
 
             tracing::debug!("password verified");
+
+            // for now, return a dummy token
+            Ok(axum::response::Json(AuthorizeResponse {
+                token: "dummy".to_string(),
+            }))
         }
         _ => {
             // should not be possible
             tracing::error!("Multiple users found with the same username");
-            return Err(Error::Unauthorized);
+            Err(Error::Unauthorized)
         }
     }
-
-    // for now, return a dummy token
-    Ok(axum::response::Json(AuthorizeResponse {
-        token: "dummy".to_string(),
-    }))
 }

@@ -17,7 +17,6 @@ pub async fn create_table(
         .attribute_name("pk".to_string())
         .key_type(aws_sdk_dynamodb::model::KeyType::Hash)
         .build();
-
     let sort_key_schema = aws_sdk_dynamodb::model::KeySchemaElement::builder()
         .attribute_name("sk".to_string())
         .key_type(aws_sdk_dynamodb::model::KeyType::Range)

@@ -38,7 +38,6 @@ pub(crate) async fn login_screen() -> axum::response::Html<&'static str> {
 
                 // Perform a POST request to /authorize
                 // If the request is successful, the s
-                //
                 fetch("/authorize", {
                     method: "POST",
                     body: JSON.stringify({ username, password }),
@@ -117,7 +116,6 @@ pub(crate) async fn signup_screen() -> axum::response::Html<&'static str> {
 
                 // Perform a POST request to /signup
                 // If the request is successful, the s
-                //
                 fetch("/signup", {
                     method: "POST",
                     body: JSON.stringify({ username, password }),

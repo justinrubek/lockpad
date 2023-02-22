@@ -29,19 +29,6 @@ impl Server {
         }
     }
 
-    pub fn with_addr(
-        addr: [u8; 4],
-        port: u16,
-        client: aws_sdk_dynamodb::Client,
-        table_name: String,
-    ) -> Self {
-        Self {
-            addr: SocketAddr::new(addr.into(), port),
-            client,
-            table_name,
-        }
-    }
-
     pub async fn run(self) -> Result<()> {
         let cors = tower_http::cors::CorsLayer::permissive();
 
