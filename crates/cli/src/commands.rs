@@ -16,7 +16,6 @@ pub(crate) struct Server {
     #[clap(subcommand)]
     pub command: ServerCommands,
 
-    // Default 0.0.0.0:3000
     #[arg(default_value = "0.0.0.0:3000", long, short)]
     pub addr: std::net::SocketAddr,
 }

@@ -3,8 +3,6 @@ pub enum Error {
     #[error(transparent)]
     Hyper(#[from] hyper::Error),
     #[error(transparent)]
-    Io(#[from] std::io::Error),
-    #[error(transparent)]
     Argon2(#[from] argon2::password_hash::Error),
 
     #[error(transparent)]

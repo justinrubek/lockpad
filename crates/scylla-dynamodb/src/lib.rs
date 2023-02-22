@@ -1,7 +1,7 @@
 pub mod credentials;
 
 /// Connects to ScyllaDB's DynamoDB API.
-/// This uses [DummyCredentialsProvider](DummyCredentialsProvider) to provide dummy credentials.
+/// This uses [DummyCredentialsProvider](crate::credentials::DummyCredentialsProvider) to provide dummy credentials.
 pub async fn connect_dynamodb(url: String) -> aws_sdk_dynamodb::Client {
     let config = aws_sdk_dynamodb::config::Builder::new()
         .region(aws_sdk_dynamodb::Region::from_static("none"))
