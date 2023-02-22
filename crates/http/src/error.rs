@@ -4,8 +4,8 @@ pub enum Error {
     Hyper(#[from] hyper::Error),
     #[error(transparent)]
     Io(#[from] std::io::Error),
-    #[error("failed to hash")]
-    Argon2(argon2::password_hash::Error),
+    #[error(transparent)]
+    Argon2(#[from] argon2::password_hash::Error),
 
     #[error(transparent)]
     DynamodbQuery(#[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::QueryError>),
@@ -21,14 +21,17 @@ pub enum Error {
     DynamodbUpdate(
         #[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::UpdateItemError>,
     ),
+
+    #[error("unauthorized")]
+    Unauthorized,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
 
 impl axum::response::IntoResponse for Error {
     fn into_response(self) -> axum::response::Response {
-        #[allow(clippy::match_single_binding)]
         let status = match self {
+            Error::Unauthorized => axum::http::StatusCode::UNAUTHORIZED,
             _ => axum::http::StatusCode::INTERNAL_SERVER_ERROR,
         };
 

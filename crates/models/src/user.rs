@@ -22,8 +22,6 @@ pub struct UserData {
 pub struct User {
     pub id: PrimaryId,
 
-    pub salt: String,
-
     #[serde(flatten)]
     pub data: UserData,
 }
@@ -31,10 +29,9 @@ pub struct User {
 impl User {
     pub const PREFIX: &'static str = "user";
 
-    pub fn new(salt: String, data: UserData) -> Self {
+    pub fn new(data: UserData) -> Self {
         Self {
             id: PrimaryId::new(),
-            salt,
             data,
         }
     }
