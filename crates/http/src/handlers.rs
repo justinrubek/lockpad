@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::error::{Error, Result};
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
@@ -23,6 +23,7 @@ pub(crate) async fn hello_world() -> axum::response::Html<&'static str> {
             </body>
 
             <a href="/login">Login</a>
+            <a href="/signup-screen">Signup</a>
         </html>
     "#,
     )
@@ -114,23 +115,6 @@ pub(crate) struct Credentials {
 #[derive(Debug, Serialize)]
 pub(crate) struct AuthorizeResponse {
     token: String,
-}
-
-/// Performs the authorization process.
-/// This is where the user's credentials are checked against the database.
-/// If the credentials are valid, a token is generated and sent to the user.
-pub(crate) async fn authorize(
-    payload: axum::extract::Json<Credentials>,
-) -> axum::response::Json<AuthorizeResponse> {
-    // TODO: Implement authorization
-    // For now, just print the credentials to the console.
-    let credentials = payload.0;
-    tracing::info!(?credentials.username, ?credentials.password, "Received credentials");
-
-    // for now, return a dummy token
-    axum::response::Json(AuthorizeResponse {
-        token: "dummy".to_string(),
-    })
 }
 
 /// Sends a screen that asks the user to provide credentials.
@@ -229,7 +213,7 @@ pub(crate) async fn list_users(
         .send()
         .await?;
 
-    tracing::info!(?res, "query result");
+    tracing::debug!(?res, "query result");
 
     let items = res.items().map(|slice| slice.to_vec()).unwrap();
 
@@ -237,7 +221,6 @@ pub(crate) async fn list_users(
         .into_iter()
         .map(|item| {
             let user: lockpad_models::user::User = serde_dynamo::from_item(item).unwrap();
-            tracing::info!(?user, "user");
             user
         })
         .collect::<Vec<_>>();
@@ -254,19 +237,15 @@ pub(crate) async fn signup(
 ) -> Result<axum::response::Json<AuthorizeResponse>> {
     // TODO: Check against database to see if the username is already taken.
 
-    // TODO: Hash the password before storing it in the database.
     let salt = SaltString::generate(&mut OsRng);
     let argon2 = Argon2::default();
     let password = payload.0.password.into_bytes();
     let password_hash = argon2.hash_password(&password, &salt).unwrap().to_string();
 
-    let user = User::new(
-        salt.to_string(),
-        UserData {
-            identifier: payload.0.username,
-            secret: password_hash,
-        },
-    );
+    let user = User::new(UserData {
+        identifier: payload.0.username,
+        secret: password_hash,
+    });
 
     let client = &dynamodb.client;
 
@@ -280,6 +259,7 @@ pub(crate) async fn signup(
         "sk".to_string(),
         AttributeValue::S(format!("{}#{}", User::PREFIX, user.data.identifier)),
     );
+    tracing::info!(?item_data, "item being created");
 
     let res = client
         .put_item()
@@ -289,6 +269,64 @@ pub(crate) async fn signup(
         .await?;
 
     tracing::info!(?res, "put item result");
+
+    // for now, return a dummy token
+    Ok(axum::response::Json(AuthorizeResponse {
+        token: "dummy".to_string(),
+    }))
+}
+
+/// Performs the authorization process.
+/// This is where the user's credentials are checked against the database.
+/// If the credentials are valid, a token is generated and sent to the user.
+pub(crate) async fn authorize(
+    dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
+    payload: axum::extract::Json<Credentials>,
+) -> Result<axum::response::Json<AuthorizeResponse>> {
+    let input_credentials = payload.0;
+
+    let client = &dynamodb.client;
+    // Query to find the user with the given username
+    let res = client
+        .query()
+        .table_name(&dynamodb.name)
+        .key_condition_expression("#pk = :pk AND #sk = :sk")
+        .expression_attribute_names("#pk", "pk")
+        .expression_attribute_names("#sk", "sk")
+        .expression_attribute_values(":pk", AttributeValue::S(User::PREFIX.to_string()))
+        .expression_attribute_values(
+            ":sk",
+            AttributeValue::S(format!("{}#{}", User::PREFIX, input_credentials.username)),
+        )
+        .send()
+        .await?;
+
+    match res.count() {
+        0 => {
+            tracing::debug!("No user found with the given username");
+            return Err(Error::Unauthorized);
+        }
+        1 => {
+            let user = res.items().unwrap()[0].clone();
+            let user: User = serde_dynamo::from_item(user).unwrap();
+            tracing::debug!(?user, "user found");
+
+            let password_hash = PasswordHash::new(&user.data.secret).unwrap();
+            Argon2::default()
+                .verify_password(input_credentials.password.as_bytes(), &password_hash)
+                .map_err(|_| {
+                    tracing::debug!("Password verification failed");
+                    Error::Unauthorized
+                })?;
+
+            tracing::debug!("password verified");
+        }
+        _ => {
+            // should not be possible
+            tracing::error!("Multiple users found with the same username");
+            return Err(Error::Unauthorized);
+        }
+    }
 
     // for now, return a dummy token
     Ok(axum::response::Json(AuthorizeResponse {
