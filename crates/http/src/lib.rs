@@ -8,7 +8,11 @@ pub mod error;
 pub mod handlers;
 
 use error::Result;
-use handlers::{authorize, hello_world, list_users, login_screen, signup, signup_screen};
+use handlers::{
+    auth::{authorize, signup},
+    pages::{login_screen, root, signup_screen},
+    user::list_users,
+};
 
 pub struct Server {
     addr: SocketAddr,
@@ -47,7 +51,7 @@ impl Server {
         };
 
         let app = Router::new()
-            .route("/", get(hello_world))
+            .route("/", get(root))
             .route("/login", get(login_screen))
             .route("/signup-screen", get(signup_screen))
             .route("/authorize", post(authorize))
