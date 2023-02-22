@@ -8,14 +8,16 @@ name = "lockpad-cli"
 path = "src/main.rs"
 
 [dependencies]
-serde_dynamo = { version = "4.0.12", features = ["aws-sdk-dynamodb+0_24"] }
 scylla-dynamodb = { path = "../scylla-dynamodb" }
 # clap = { version = "4.0.19", features = ["derive"] }
 # reqwest = { version = "0.11.12", features = ["rustls-tls"] }
 serde = { workspace = true }
+serde_dynamo = { workspace = true }
 serde_json = { workspace = true }
 lockpad-http = { path = "../http" }
+lockpad-models = { path = "../models" }
 tokio = { workspace = true }
+tracing = { workspace = true }
 tracing-subscriber = "0.3.16"
 clap = { version = "4.1.6", features = ["derive"] }
 aws-sdk-dynamodb = { workspace = true }

@@ -7,13 +7,17 @@ edition = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+aws-sdk-dynamodb = { workspace = true }
 axum = "0.6.4"
 hyper = "0.14.24"
+lockpad-models = { path = "../models" }
 serde = { workspace = true }
-thiserror = { workspace = true }
-# serde = { version = "1", features = ["derive"] }
+serde_dynamo = { workspace = true }
 # serde_json = "1.0.87"
+scylla-dynamodb = { path = "../scylla-dynamodb" }
+thiserror = { workspace = true }
 tokio = { workspace = true }
 tower = { version = "0.4", features = ["util"] }
 tower-http = { version = "0.3.0", features = ["fs", "cors"] }
 tracing = { workspace = true }
+argon2 = "0.4.1"
