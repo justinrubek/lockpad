@@ -1,7 +1,7 @@
 use crate::commands::{Commands, ServerCommands};
 use clap::Parser;
-use lockpad::{create_table, entity::PrimaryId, models::user::User};
-use serde_dynamo::to_item;
+use lockpad::create_table;
+use tracing::info;
 
 mod commands;
 
@@ -9,11 +9,18 @@ mod commands;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
+    // TODO: load configuration from env/file
+    let table_name = "lockpad-test-1";
+    let dynamo_client =
+        scylla_dynamodb::connect_dynamodb("http://localhost:8100".to_string()).await;
+    create_table_if_not_exists(&dynamo_client, table_name).await?;
+
     let args = commands::Args::parse();
     match args.command {
         Commands::Server(server) => {
             let cmd = server.command;
-            let server = lockpad_http::Server::default();
+            let server =
+                lockpad_http::Server::new(server.addr, dynamo_client, table_name.to_string());
 
             match cmd {
                 ServerCommands::Http => server.run().await?,
@@ -24,32 +31,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[allow(dead_code)]
-async fn create_table_and_user() -> Result<(), Box<dyn std::error::Error>> {
-    let client = scylla_dynamodb::connect_dynamodb("http://localhost:8100".to_string()).await;
-    create_table(&client, "users").await?;
-
+async fn create_table_if_not_exists(
+    client: &aws_sdk_dynamodb::Client,
+    table_name: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    info!(?table_name, "checking if table exists");
     let all_tables = client.list_tables().send().await?;
-    println!("{:?}", all_tables);
+    if !all_tables
+        .table_names()
+        .unwrap()
+        .contains(&table_name.to_string())
+    {
+        info!(?table_name, "table does not exist, creating");
+        create_table(client, table_name).await?;
+    }
 
-    let user = User {
-        id: PrimaryId {
-            pk: "pk".to_string(),
-            sk: "sk".to_string(),
-        },
-        name: "name".to_string(),
-    };
-    println!("{:?}", user);
-    let item = to_item(user)?;
-    client
-        .put_item()
-        .table_name("users")
-        .set_item(Some(item))
-        .send()
-        .await?;
-
-    let all_items = client.scan().table_name("users").send().await?;
-
-    println!("{:?}", all_items);
     Ok(())
 }

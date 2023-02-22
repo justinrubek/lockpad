@@ -11,3 +11,9 @@ pub async fn connect_dynamodb(url: String) -> aws_sdk_dynamodb::Client {
 
     aws_sdk_dynamodb::Client::from_conf(config)
 }
+
+#[derive(Clone, Debug)]
+pub struct DynamodbTable {
+    pub name: String,
+    pub client: aws_sdk_dynamodb::Client,
+}
