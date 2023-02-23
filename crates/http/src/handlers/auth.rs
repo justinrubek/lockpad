@@ -4,9 +4,11 @@ use argon2::{
     Argon2,
 };
 use aws_sdk_dynamodb::model::AttributeValue;
-use lockpad_models::user::{User, UserData};
+use lockpad_models::{
+    entity::{EntityPrefix, PutEntity},
+    user::{User, UserData},
+};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct Credentials {
@@ -37,27 +39,8 @@ pub(crate) async fn signup(
         identifier: payload.0.username,
         secret: password_hash,
     });
-
-    let client = &dynamodb.client;
-
-    // We need to prepare the pk and sk attributes for the user manually
-    let mut item_data: HashMap<String, AttributeValue> = serde_dynamo::to_item(&user).unwrap();
-    item_data.insert(
-        "pk".to_string(),
-        AttributeValue::S(User::PREFIX.to_string()),
-    );
-    item_data.insert(
-        "sk".to_string(),
-        AttributeValue::S(format!("{}#{}", User::PREFIX, user.data.identifier)),
-    );
-    tracing::info!(?item_data, "item being created");
-
-    let res = client
-        .put_item()
-        .table_name(&dynamodb.name)
-        .set_item(Some(item_data))
-        .send()
-        .await?;
+    tracing::info!(?user, "creating user");
+    let res = user.put_item(&dynamodb)?.send().await?;
 
     tracing::info!(?res, "put item result");
 
