@@ -1,4 +1,7 @@
-use crate::entity::PrimaryId;
+use crate::{
+    entity::{EntityPrefix, PrimaryId, UniqueEntity},
+    error::Result,
+};
 use serde::{Deserialize, Serialize};
 
 /* TODO:
@@ -27,12 +30,35 @@ pub struct User {
 }
 
 impl User {
-    pub const PREFIX: &'static str = "user";
-
     pub fn new(data: UserData) -> Self {
         Self {
             id: PrimaryId::new(),
             data,
         }
     }
+}
+
+impl UniqueEntity for User {
+    fn unique_field(
+        &self,
+        fields: std::collections::HashMap<String, aws_sdk_dynamodb::model::AttributeValue>,
+    ) -> Result<Option<aws_sdk_dynamodb::model::AttributeValue>> {
+        let field = fields.get("identifier").unwrap();
+        Ok(Some(field.clone()))
+    }
+}
+
+impl EntityPrefix for User {
+    const PREFIX: &'static str = "user";
+}
+
+/// Database representation of a user.
+/// This is the format that is used to interact with the database.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct DbRepr {
+    pub pk: String,
+    pub sk: String,
+    pub id: PrimaryId,
+    pub identifier: String,
+    pub secret: String,
 }

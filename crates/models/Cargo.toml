@@ -5,7 +5,10 @@ edition = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+aws-sdk-dynamodb = { workspace = true }
 serde = { workspace = true }
+serde_dynamo = { workspace = true }
+scylla-dynamodb = { path = "../scylla-dynamodb" }
 # serde_json = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }

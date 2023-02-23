@@ -1,7 +1,7 @@
 use crate::error::Result;
 use aws_sdk_dynamodb::model::AttributeValue;
 use axum::Json;
-use lockpad_models::user;
+use lockpad_models::{entity::EntityPrefix, user};
 
 /// Performs a dynamodb query to list all users.
 pub(crate) async fn list_users(
