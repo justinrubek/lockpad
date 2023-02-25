@@ -5,9 +5,10 @@ use argon2::{
 };
 use aws_sdk_dynamodb::model::AttributeValue;
 use lockpad_models::{
-    entity::{EntityPrefix, PutEntity},
-    user::{User, UserData},
+    entity::{Builder, PutEntity},
+    user::User,
 };
+use scylla_dynamodb::entity::PrefixedEntity;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
@@ -35,10 +36,11 @@ pub(crate) async fn signup(
     let password = payload.0.password.into_bytes();
     let password_hash = argon2.hash_password(&password, &salt).unwrap().to_string();
 
-    let user = User::new(UserData {
-        identifier: payload.0.username,
-        secret: password_hash,
-    });
+    let user = User::builder()
+        .identifier(payload.0.username)
+        .secret(password_hash)
+        .build()?;
+
     tracing::info!(?user, "creating user");
     let res = user.put_item(&dynamodb)?.send().await?;
 
@@ -85,7 +87,7 @@ pub(crate) async fn authorize(
             let user: User = serde_dynamo::from_item(user).unwrap();
             tracing::debug!(?user, "user found");
 
-            let password_hash = PasswordHash::new(&user.data.secret).unwrap();
+            let password_hash = PasswordHash::new(&user.secret).unwrap();
             Argon2::default()
                 .verify_password(input_credentials.password.as_bytes(), &password_hash)
                 .map_err(|_| {

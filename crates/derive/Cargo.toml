@@ -1,0 +1,12 @@
+[package]
+name = "lockpad-derive"
+version = { workspace = true }
+edition = { workspace = true }
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "1.0"
+scylla-dynamodb = { path = "../scylla-dynamodb" }
+quote = "1.0"

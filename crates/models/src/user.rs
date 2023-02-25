@@ -1,64 +1,63 @@
 use crate::{
-    entity::{EntityPrefix, PrimaryId, UniqueEntity},
-    error::Result,
+    entity::PrimaryId,
+    error::{Error, Result},
 };
+use lockpad_derive::UniqueEntity;
+use scylla_dynamodb::entity::PrefixedEntity;
 use serde::{Deserialize, Serialize};
 
-/* TODO:
- * - Implement types for interacting with the user model
- * This should include:
- *
- * - User with all fields, including identity and credentials
- * - Create user, which is a subset of the user model
- * - Update user, which is a subset of the user model
- *   - Updates may need to consider partial and full updates
- * - Provide some way of serializing this to dynamodb format
- */
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct UserData {
-    pub identifier: String,
-    pub secret: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, UniqueEntity)]
 pub struct User {
     pub id: PrimaryId,
 
-    #[serde(flatten)]
-    pub data: UserData,
+    #[unique_id]
+    pub identifier: String,
+    pub secret: String,
 }
 
 impl User {
-    pub fn new(data: UserData) -> Self {
-        Self {
-            id: PrimaryId::new(),
-            data,
-        }
+    pub fn builder() -> Builder {
+        Builder::default()
     }
 }
 
-impl UniqueEntity for User {
-    fn unique_field(
-        &self,
-        fields: std::collections::HashMap<String, aws_sdk_dynamodb::model::AttributeValue>,
-    ) -> Result<Option<aws_sdk_dynamodb::model::AttributeValue>> {
-        let field = fields.get("identifier").unwrap();
-        Ok(Some(field.clone()))
-    }
-}
-
-impl EntityPrefix for User {
+impl PrefixedEntity for User {
     const PREFIX: &'static str = "user";
 }
 
-/// Database representation of a user.
-/// This is the format that is used to interact with the database.
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct DbRepr {
-    pub pk: String,
-    pub sk: String,
-    pub id: PrimaryId,
-    pub identifier: String,
-    pub secret: String,
+#[derive(Debug, Default)]
+pub struct Builder {
+    identifier: Option<String>,
+    secret: Option<String>,
+}
+
+impl Builder {
+    pub fn identifier(mut self, identifier: String) -> Self {
+        self.identifier = Some(identifier);
+        self
+    }
+
+    pub fn secret(mut self, secret: String) -> Self {
+        self.secret = Some(secret);
+        self
+    }
+}
+
+impl crate::entity::Builder for Builder {
+    type Item = User;
+
+    fn build(self) -> Result<User> {
+        let identifier = self
+            .identifier
+            .ok_or_else(|| Error::ModelFieldsMissing("identifier"))?;
+        let secret = self
+            .secret
+            .ok_or_else(|| Error::ModelFieldsMissing("secret"))?;
+
+        Ok(User {
+            id: PrimaryId::new(),
+            identifier,
+            secret,
+        })
+    }
 }
