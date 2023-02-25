@@ -22,6 +22,8 @@ pub enum Error {
     DynamodbUpdate(
         #[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::UpdateItemError>,
     ),
+    #[error(transparent)]
+    DynamodbScan(#[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::ScanError>),
 
     #[error("unauthorized")]
     Unauthorized,

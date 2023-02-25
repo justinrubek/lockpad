@@ -20,6 +20,17 @@ pub struct Server {
     table_name: String,
 }
 
+pub fn router() -> Router<scylla_dynamodb::DynamodbTable> {
+    Router::new()
+        .route("/", get(root))
+        .route("/login", get(login_screen))
+        .route("/signup-screen", get(signup_screen))
+        .route("/authorize", post(authorize))
+        .route("/signup", post(signup))
+        .route("/users", get(list_users))
+        .route("/admin/wipe-table", get(handlers::admin::wipe_table))
+}
+
 impl Server {
     pub fn new(addr: SocketAddr, client: aws_sdk_dynamodb::Client, table_name: String) -> Self {
         Self {
@@ -37,15 +48,7 @@ impl Server {
             client: self.client,
         };
 
-        let app = Router::new()
-            .route("/", get(root))
-            .route("/login", get(login_screen))
-            .route("/signup-screen", get(signup_screen))
-            .route("/authorize", post(authorize))
-            .route("/signup", post(signup))
-            .route("/users", get(list_users))
-            .with_state(dynamodb)
-            .layer(cors);
+        let app = router().with_state(dynamodb).layer(cors);
 
         tracing::info!("Listening on {0}", self.addr);
         axum::Server::bind(&self.addr)
