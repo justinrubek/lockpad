@@ -1,9 +1,6 @@
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
     #[error(transparent)]
-    SerdeDynamo(#[from] serde_dynamo::Error),
-
-    #[error(transparent)]
     DynamodbQuery(#[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::QueryError>),
     #[error(transparent)]
     DynamodbPut(#[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::PutItemError>),
@@ -17,11 +14,6 @@ pub enum Error {
     DynamodbUpdate(
         #[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::UpdateItemError>,
     ),
-
-    #[error("invalid unique field")]
-    InvalidUniqueField,
-    #[error("required fields missing")]
-    ModelFieldsMissing(&'static str),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

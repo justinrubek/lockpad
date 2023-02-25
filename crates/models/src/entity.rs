@@ -1,5 +1,5 @@
-use crate::error::{Error, Result};
-use aws_sdk_dynamodb::model::AttributeValue;
+use crate::error::Result;
+use scylla_dynamodb::entity::PrefixedEntity;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -33,16 +33,6 @@ pub trait EntityPrefix {
     const PREFIX: &'static str;
 }
 
-/// A UniqueEntity is something with a unique field.
-/// This field will be encoded in the object's key to ensure uniqueness.
-pub trait UniqueEntity {
-    /// Retrieve the unique value for this entity.
-    fn unique_field(
-        &self,
-        fields: std::collections::HashMap<String, aws_sdk_dynamodb::model::AttributeValue>,
-    ) -> Result<Option<aws_sdk_dynamodb::model::AttributeValue>>;
-}
-
 pub trait Entity {
     fn attributes(
         &self,
@@ -67,27 +57,32 @@ pub trait PutEntity {
     ) -> Result<aws_sdk_dynamodb::client::fluent_builders::PutItem>;
 }
 
-impl<T> PutEntity for T
+pub trait GetKeys {
+    fn pk(
+        &self,
+        fields: std::collections::HashMap<String, aws_sdk_dynamodb::model::AttributeValue>,
+    ) -> Result<aws_sdk_dynamodb::model::AttributeValue>;
+
+    fn sk(
+        &self,
+        fields: std::collections::HashMap<String, aws_sdk_dynamodb::model::AttributeValue>,
+    ) -> Result<aws_sdk_dynamodb::model::AttributeValue>;
+}
+
+impl<T: scylla_dynamodb::entity::GetKeys> PutEntity for T
 where
-    T: Entity + UniqueEntity + EntityPrefix + Send + std::marker::Sync,
+    T: Entity + PrefixedEntity,
 {
     fn put_item(
         &self,
         table: &scylla_dynamodb::DynamodbTable,
     ) -> Result<aws_sdk_dynamodb::client::fluent_builders::PutItem> {
-        // TODO: Implement PutItem for unique entitiy. Base this on the user model.
         let mut item = self.attributes()?;
-        let unique_field = self.unique_field(item.clone())?.unwrap();
+        let pk = self.pk(&item);
+        let sk = self.sk(&item);
 
-        // Add the prefix to the unique field (`{prefix}#{unique_field}`)
-        let unique_attr = match unique_field {
-            AttributeValue::S(s) => AttributeValue::S(format!("{}#{}", T::PREFIX, s)),
-            AttributeValue::N(n) => AttributeValue::S(format!("{}#{}", T::PREFIX, n)),
-            _ => return Err(Error::InvalidUniqueField),
-        };
-
-        item.insert("pk".to_string(), AttributeValue::S(T::PREFIX.to_string()));
-        item.insert("sk".to_string(), unique_attr);
+        item.insert("pk".to_string(), pk);
+        item.insert("sk".to_string(), sk);
 
         let res = table
             .client
@@ -97,4 +92,10 @@ where
 
         Ok(res)
     }
+}
+
+pub trait Builder {
+    type Item;
+
+    fn build(self) -> Result<Self::Item>;
 }

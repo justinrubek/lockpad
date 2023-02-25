@@ -937,6 +937,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "lockpad-derive"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "scylla-dynamodb",
+ "syn",
+]
+
+[[package]]
 name = "lockpad-http"
 version = "0.1.0"
 dependencies = [
@@ -962,6 +971,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "aws-sdk-dynamodb",
+ "lockpad-derive",
  "scylla-dynamodb",
  "serde",
  "serde_dynamo",
@@ -1380,6 +1390,7 @@ dependencies = [
  "aws-config",
  "aws-credential-types",
  "aws-sdk-dynamodb",
+ "thiserror",
 ]
 
 [[package]]
