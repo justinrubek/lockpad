@@ -2,7 +2,7 @@ use crate::error::Result;
 use aws_sdk_dynamodb::model::AttributeValue;
 use axum::Json;
 use lockpad_models::user;
-use scylla_dynamodb::entity::PrefixedEntity;
+use scylla_dynamodb::entity::{PrefixedEntity, QueryEntity};
 
 /// Performs a dynamodb query to list all users.
 pub(crate) async fn list_users(
@@ -10,14 +10,7 @@ pub(crate) async fn list_users(
 ) -> Result<Json<Vec<user::User>>> {
     let client = &dynamodb.client;
 
-    let res = client
-        .query()
-        .table_name(&dynamodb.name)
-        .key_condition_expression("#pk = :pk")
-        .expression_attribute_names("#pk", "pk")
-        .expression_attribute_values(":pk", AttributeValue::S(user::User::PREFIX.to_string()))
-        .send()
-        .await?;
+    let res = user::User::query(&dynamodb)?.send().await?;
 
     tracing::debug!(?res, "query result");
 
