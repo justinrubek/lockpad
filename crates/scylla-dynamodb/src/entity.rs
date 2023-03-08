@@ -1,4 +1,5 @@
 use crate::error::Result;
+use aws_sdk_dynamodb::model::AttributeValue;
 use serde::Serialize;
 
 pub trait GetKeys {
@@ -45,7 +46,6 @@ pub trait PutEntity {
 
 pub trait QueryEntity {
     fn query(
-        &self,
         table: &crate::DynamodbTable,
     ) -> Result<aws_sdk_dynamodb::client::fluent_builders::Query>;
 }
@@ -72,6 +72,28 @@ where
             .put_item()
             .table_name(&table.name)
             .set_item(Some(item));
+
+        Ok(res)
+    }
+}
+
+// Generic query function
+impl<T: GetKeys> QueryEntity for T
+where
+    T: Entity + PrefixedEntity,
+{
+    fn query(
+        table: &crate::DynamodbTable,
+    ) -> Result<aws_sdk_dynamodb::client::fluent_builders::Query> {
+        let pk_prefix = Self::PREFIX.to_string();
+
+        let res = table
+            .client
+            .query()
+            .table_name(&table.name)
+            .key_condition_expression("#pk = :pk")
+            .expression_attribute_names("#pk", "pk")
+            .expression_attribute_values(":pk", AttributeValue::S(pk_prefix));
 
         Ok(res)
     }
