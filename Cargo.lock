@@ -1390,6 +1390,8 @@ dependencies = [
  "aws-config",
  "aws-credential-types",
  "aws-sdk-dynamodb",
+ "serde",
+ "serde_dynamo",
  "thiserror",
 ]
 
