@@ -4,11 +4,8 @@ use argon2::{
     Argon2,
 };
 use aws_sdk_dynamodb::model::AttributeValue;
-use lockpad_models::{
-    entity::{Builder, PutEntity},
-    user::User,
-};
-use scylla_dynamodb::entity::PrefixedEntity;
+use lockpad_models::{entity::Builder, user::User};
+use scylla_dynamodb::entity::{PrefixedEntity, PutEntity};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]

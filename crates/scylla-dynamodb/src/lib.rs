@@ -1,5 +1,6 @@
 pub mod credentials;
 pub mod entity;
+pub mod error;
 
 /// Connects to ScyllaDB's DynamoDB API.
 /// This uses [DummyCredentialsProvider](crate::credentials::DummyCredentialsProvider) to provide dummy credentials.

@@ -14,6 +14,9 @@ pub enum Error {
     DynamodbUpdate(
         #[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::UpdateItemError>,
     ),
+
+    #[error(transparent)]
+    SerdeDynamo(#[from] serde_dynamo::Error),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

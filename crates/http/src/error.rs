@@ -7,6 +7,8 @@ pub enum Error {
 
     #[error(transparent)]
     LockpadModels(#[from] lockpad_models::error::Error),
+    #[error(transparent)]
+    LockpadDynamodb(#[from] scylla_dynamodb::error::Error),
 
     #[error(transparent)]
     DynamodbQuery(#[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::QueryError>),
