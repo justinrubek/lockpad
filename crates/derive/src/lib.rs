@@ -46,6 +46,26 @@ pub fn unique_entity(input: TokenStream) -> TokenStream {
                         aws_sdk_dynamodb::model::AttributeValue::S(format!("{}#{}", Self::PREFIX, self.#id_field))
                     }
                 }
+
+                impl scylla_dynamodb::entity::FormatKey for #name {
+                    // the key is the unique id
+                    type Key = String;
+
+                    fn format_key(
+                        key: Self::Key,
+                    ) -> std::collections::HashMap<String, aws_sdk_dynamodb::model::AttributeValue> {
+                        let mut map = std::collections::HashMap::new();
+                        map.insert(
+                            "pk".to_string(),
+                            aws_sdk_dynamodb::model::AttributeValue::S(format!("{}", Self::PREFIX)),
+                        );
+                        map.insert(
+                            "sk".to_string(),
+                            aws_sdk_dynamodb::model::AttributeValue::S(format!("{}#{}", Self::PREFIX, key)),
+                        );
+                        map
+                    }
+                }
             };
 
             gen.into()
@@ -107,6 +127,25 @@ pub fn owned_entity(input: TokenStream) -> TokenStream {
                         fields: std::collections::HashMap<String, aws_sdk_dynamodb::model::AttributeValue>,
                     ) -> Result<aws_sdk_dynamodb::model::AttributeValue> {
                         Ok(aws_sdk_dynamodb::model::AttributeValue::S(format!("{}#{}", Self::PREFIX, self.#object_id_field)))
+                    }
+                }
+
+                impl scylla_dynamodb::entity::FormatKey for #name {
+                    type Key = (String, String);
+
+                    fn format_key(
+                        key: Self::Key,
+                    ) -> std::collections::HashMap<String, aws_sdk_dynamodb::model::AttributeValue> {
+                        let mut map = std::collections::HashMap::new();
+                        map.insert(
+                            "pk".to_string(),
+                            aws_sdk_dynamodb::model::AttributeValue::S(format!("{}#{}", Self::PREFIX, key.0)),
+                        );
+                        map.insert(
+                            "sk".to_string(),
+                            aws_sdk_dynamodb::model::AttributeValue::S(format!("{}#{}", Self::PREFIX, key.1)),
+                        );
+                        map
                     }
                 }
             };
