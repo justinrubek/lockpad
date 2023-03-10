@@ -1,15 +1,12 @@
 use crate::error::Result;
-use aws_sdk_dynamodb::model::AttributeValue;
 use axum::Json;
 use lockpad_models::user;
-use scylla_dynamodb::entity::{PrefixedEntity, QueryEntity};
+use scylla_dynamodb::entity::{FormatKey, GetEntity, QueryEntity};
 
 /// Performs a dynamodb query to list all users.
 pub(crate) async fn list_users(
     dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
 ) -> Result<Json<Vec<user::User>>> {
-    let client = &dynamodb.client;
-
     let res = user::User::query(&dynamodb)?.send().await?;
 
     tracing::debug!(?res, "query result");
@@ -25,4 +22,22 @@ pub(crate) async fn list_users(
         .collect::<Vec<_>>();
 
     Ok(Json(users))
+}
+
+pub(crate) async fn get_user(
+    dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
+    user_id: axum::extract::Path<String>,
+) -> Result<Json<user::User>> {
+    let user_id = user_id.to_string();
+    tracing::info!(?user_id, "getting user");
+
+    let key = user::User::format_key(user_id);
+
+    let res = user::User::get(&dynamodb, key)?.send().await?;
+
+    tracing::info!(?res, "query result");
+
+    let item = res.item().unwrap();
+
+    Ok(Json(serde_dynamo::from_item(item.to_owned()).unwrap()))
 }

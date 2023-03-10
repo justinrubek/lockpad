@@ -11,7 +11,7 @@ use error::Result;
 use handlers::{
     auth::{authorize, signup},
     pages::{login_screen, root, signup_screen},
-    user::list_users,
+    user::{get_user, list_users},
 };
 
 pub struct Server {
@@ -28,6 +28,7 @@ pub fn router() -> Router<scylla_dynamodb::DynamodbTable> {
         .route("/authorize", post(authorize))
         .route("/signup", post(signup))
         .route("/users", get(list_users))
+        .route("/users/:user_id", get(get_user))
         .route("/admin/wipe-table", get(handlers::admin::wipe_table))
 }
 

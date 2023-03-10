@@ -14,6 +14,12 @@ pub trait GetKeys {
     ) -> aws_sdk_dynamodb::model::AttributeValue;
 }
 
+pub trait FormatKey {
+    type Key;
+
+    fn format_key(key: Self::Key) -> std::collections::HashMap<String, AttributeValue>;
+}
+
 pub trait PrefixedEntity {
     const PREFIX: &'static str;
 }
@@ -50,6 +56,13 @@ pub trait QueryEntity {
     ) -> Result<aws_sdk_dynamodb::client::fluent_builders::Query>;
 }
 
+pub trait GetEntity {
+    fn get(
+        table: &crate::DynamodbTable,
+        key: std::collections::HashMap<String, aws_sdk_dynamodb::model::AttributeValue>,
+    ) -> Result<aws_sdk_dynamodb::client::fluent_builders::GetItem>;
+}
+
 impl<T: GetKeys> PutEntity for T
 where
     T: Entity + PrefixedEntity,
@@ -77,7 +90,6 @@ where
     }
 }
 
-// Generic query function
 impl<T: GetKeys> QueryEntity for T
 where
     T: Entity + PrefixedEntity,
@@ -94,6 +106,24 @@ where
             .key_condition_expression("#pk = :pk")
             .expression_attribute_names("#pk", "pk")
             .expression_attribute_values(":pk", AttributeValue::S(pk_prefix));
+
+        Ok(res)
+    }
+}
+
+impl<T: FormatKey> GetEntity for T
+where
+    T: Entity,
+{
+    fn get(
+        table: &crate::DynamodbTable,
+        key: std::collections::HashMap<String, aws_sdk_dynamodb::model::AttributeValue>,
+    ) -> Result<aws_sdk_dynamodb::client::fluent_builders::GetItem> {
+        let res = table
+            .client
+            .get_item()
+            .table_name(&table.name)
+            .set_key(Some(key));
 
         Ok(res)
     }
