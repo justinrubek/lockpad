@@ -7,7 +7,7 @@ use scylla_dynamodb::entity::{FormatKey, GetEntity, QueryEntity};
 pub(crate) async fn list_users(
     dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
 ) -> Result<Json<Vec<user::User>>> {
-    let res = user::User::query(&dynamodb)?.send().await?;
+    let res = user::User::query(&dynamodb, ())?.send().await?;
 
     tracing::debug!(?res, "query result");
 

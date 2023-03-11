@@ -1,5 +1,6 @@
 use crate::error::Result;
 use aws_sdk_dynamodb::model::AttributeValue;
+use axum::extract::Json;
 
 /// Performs a dynamodb query to list all users.
 pub(crate) async fn wipe_table(
@@ -31,4 +32,25 @@ pub(crate) async fn wipe_table(
     }
 
     Ok(())
+}
+
+pub(crate) async fn scan_table(
+    dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
+) -> Result<Json<Vec<serde_json::Value>>> {
+    tracing::info!("Scanning table");
+    let client = &dynamodb.client;
+
+    let res = client.scan().table_name(&dynamodb.name).send().await?;
+
+    // Scan all items from dynamodb, and return them as a list of JSON objects
+    let items = res.items().map(|slice| slice.to_vec()).unwrap();
+    let items = items
+        .into_iter()
+        .map(|item| {
+            let item: serde_json::Value = serde_dynamo::from_item(item).unwrap();
+            item
+        })
+        .collect::<Vec<_>>();
+
+    Ok(Json(items))
 }

@@ -17,6 +17,9 @@ pub enum Error {
 
     #[error(transparent)]
     SerdeDynamo(#[from] serde_dynamo::Error),
+
+    #[error(transparent)]
+    UlidDecode(#[from] ulid::DecodeError),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
