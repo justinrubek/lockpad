@@ -1,6 +1,35 @@
 use crate::error::Result;
 use aws_sdk_dynamodb::model::AttributeValue;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PrimaryId(ulid::Ulid);
+
+impl Default for PrimaryId {
+    fn default() -> Self {
+        Self(ulid::Ulid::new())
+    }
+}
+
+impl PrimaryId {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl std::str::FromStr for PrimaryId {
+    type Err = crate::error::Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        Ok(Self(ulid::Ulid::from_str(s)?))
+    }
+}
+
+impl std::fmt::Display for PrimaryId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
 
 pub trait GetKeys {
     fn pk(
@@ -51,8 +80,11 @@ pub trait PutEntity {
 }
 
 pub trait QueryEntity {
+    type Namespace;
+
     fn query(
         table: &crate::DynamodbTable,
+        namespace: Self::Namespace,
     ) -> Result<aws_sdk_dynamodb::client::fluent_builders::Query>;
 }
 
@@ -80,32 +112,13 @@ where
         item.insert("pk".to_string(), pk);
         item.insert("sk".to_string(), sk);
 
+        tracing::info!(?item, "putting item");
+
         let res = table
             .client
             .put_item()
             .table_name(&table.name)
             .set_item(Some(item));
-
-        Ok(res)
-    }
-}
-
-impl<T: GetKeys> QueryEntity for T
-where
-    T: Entity + PrefixedEntity,
-{
-    fn query(
-        table: &crate::DynamodbTable,
-    ) -> Result<aws_sdk_dynamodb::client::fluent_builders::Query> {
-        let pk_prefix = Self::PREFIX.to_string();
-
-        let res = table
-            .client
-            .query()
-            .table_name(&table.name)
-            .key_condition_expression("#pk = :pk")
-            .expression_attribute_names("#pk", "pk")
-            .expression_attribute_values(":pk", AttributeValue::S(pk_prefix));
 
         Ok(res)
     }

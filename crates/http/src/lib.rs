@@ -30,6 +30,12 @@ pub fn router() -> Router<scylla_dynamodb::DynamodbTable> {
         .route("/users", get(list_users))
         .route("/users/:user_id", get(get_user))
         .route("/admin/wipe-table", get(handlers::admin::wipe_table))
+        .route("/admin/scan-table", get(handlers::admin::scan_table))
+        .route(
+            "/applications",
+            get(handlers::application::list_applications)
+                .post(handlers::application::create_application),
+        )
 }
 
 impl Server {

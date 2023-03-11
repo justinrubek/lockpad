@@ -940,8 +940,10 @@ dependencies = [
 name = "lockpad-derive"
 version = "0.1.0"
 dependencies = [
+ "aws-sdk-dynamodb",
  "quote",
  "scylla-dynamodb",
+ "serde_dynamo",
  "syn",
 ]
 
@@ -958,6 +960,7 @@ dependencies = [
  "scylla-dynamodb",
  "serde",
  "serde_dynamo",
+ "serde_json",
  "thiserror",
  "tokio",
  "tower",
@@ -1393,6 +1396,8 @@ dependencies = [
  "serde",
  "serde_dynamo",
  "thiserror",
+ "tracing",
+ "ulid",
 ]
 
 [[package]]

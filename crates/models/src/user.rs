@@ -1,9 +1,6 @@
-use crate::{
-    entity::PrimaryId,
-    error::{Error, Result},
-};
+use crate::error::{Error, Result};
 use lockpad_derive::UniqueEntity;
-use scylla_dynamodb::entity::PrefixedEntity;
+use scylla_dynamodb::entity::{PrefixedEntity, PrimaryId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, UniqueEntity)]
@@ -46,7 +43,7 @@ impl Builder {
 impl crate::entity::Builder for Builder {
     type Item = User;
 
-    fn build(self) -> Result<User> {
+    fn build(self) -> Result<Self::Item> {
         let identifier = self
             .identifier
             .ok_or_else(|| Error::ModelFieldsMissing("identifier"))?;
