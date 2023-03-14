@@ -21,3 +21,4 @@ tracing = { workspace = true }
 tracing-subscriber = "0.3.16"
 clap = { version = "4.1.6", features = ["derive"] }
 aws-sdk-dynamodb = { workspace = true }
+ed25519-compact = { version = "2.0.4", features = ["ed25519"] }

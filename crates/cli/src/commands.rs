@@ -9,6 +9,8 @@ pub(crate) struct Args {
 pub(crate) enum Commands {
     /// commands for running the server
     Server(Server),
+    /// commands for generating keypairs
+    Key(Key),
 }
 
 #[derive(clap::Args, Debug)]
@@ -24,4 +26,16 @@ pub(crate) struct Server {
 pub(crate) enum ServerCommands {
     /// start the http server
     Http,
+}
+
+#[derive(clap::Args, Debug)]
+pub(crate) struct Key {
+    #[clap(subcommand)]
+    pub command: KeyCommands,
+}
+
+#[derive(clap::Subcommand, Debug)]
+pub(crate) enum KeyCommands {
+    /// generate a new keypair
+    Generate,
 }

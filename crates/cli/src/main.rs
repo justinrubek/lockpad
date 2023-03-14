@@ -1,6 +1,8 @@
 use crate::commands::{Commands, ServerCommands};
 use clap::Parser;
+use commands::KeyCommands;
 use lockpad::create_table;
+use std::io::Write;
 use tracing::info;
 
 mod commands;
@@ -24,6 +26,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             match cmd {
                 ServerCommands::Http => server.run().await?,
+            }
+        }
+
+        Commands::Key(key) => {
+            let cmd = key.command;
+
+            match cmd {
+                KeyCommands::Generate => {
+                    let keypair = ed25519_compact::KeyPair::generate();
+
+                    let mut file = std::fs::File::create("secret.der")?;
+                    file.write_all(&keypair.sk.to_der())?;
+
+                    let mut file = std::fs::File::create("public.der")?;
+                    file.write_all(&keypair.pk.to_der())?;
+                }
             }
         }
     }

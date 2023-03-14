@@ -6,3 +6,6 @@ target
 
 .tmp
 .s.PGSQL.5432.lock
+
+secret.der
+public.der
