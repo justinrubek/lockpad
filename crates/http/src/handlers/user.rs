@@ -1,11 +1,11 @@
-use crate::error::Result;
-use axum::Json;
+use crate::{error::Result, ServerState};
+use axum::{extract::State, Json};
 use lockpad_models::user;
 use scylla_dynamodb::entity::{FormatKey, GetEntity, QueryEntity};
 
 /// Performs a dynamodb query to list all users.
 pub(crate) async fn list_users(
-    dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
+    State(ServerState { dynamodb, .. }): State<ServerState>,
 ) -> Result<Json<Vec<user::User>>> {
     let res = user::User::query(&dynamodb, ())?.send().await?;
 
@@ -25,7 +25,7 @@ pub(crate) async fn list_users(
 }
 
 pub(crate) async fn get_user(
-    dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
+    State(ServerState { dynamodb, .. }): State<ServerState>,
     user_id: axum::extract::Path<String>,
 ) -> Result<Json<user::User>> {
     let user_id = user_id.to_string();

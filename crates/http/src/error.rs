@@ -4,6 +4,14 @@ pub enum Error {
     Hyper(#[from] hyper::Error),
     #[error(transparent)]
     Argon2(#[from] argon2::password_hash::Error),
+    #[error(transparent)]
+    Jsonwebtoken(#[from] jsonwebtoken::errors::Error),
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+    #[error(transparent)]
+    Time(#[from] std::time::SystemTimeError),
+    #[error(transparent)]
+    SerdeDynamo(#[from] serde_dynamo::Error),
 
     #[error(transparent)]
     LockpadModels(#[from] lockpad_models::error::Error),
@@ -26,6 +34,9 @@ pub enum Error {
     ),
     #[error(transparent)]
     DynamodbScan(#[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::ScanError>),
+
+    #[error("Failed to build server struct")]
+    ServerBuilder,
 
     #[error("unauthorized")]
     Unauthorized,

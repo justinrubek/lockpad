@@ -557,6 +557,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "crate-lib"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "thiserror",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "crypto-common"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1002,6 +1012,7 @@ dependencies = [
  "argon2",
  "aws-sdk-dynamodb",
  "axum",
+ "base64 0.21.0",
  "hyper",
  "jsonwebtoken",
  "lockpad-models",

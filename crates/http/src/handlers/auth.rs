@@ -1,11 +1,15 @@
-use crate::error::{Error, Result};
+use crate::{
+    error::{Error, Result},
+    ServerState,
+};
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
-use aws_sdk_dynamodb::model::AttributeValue;
+use axum::extract::State;
+use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 use lockpad_models::{entity::Builder, user::User};
-use scylla_dynamodb::entity::{PrefixedEntity, PutEntity};
+use scylla_dynamodb::entity::{FormatKey, GetEntity, PutEntity};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
@@ -19,19 +23,68 @@ pub(crate) struct AuthorizeResponse {
     token: String,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+struct Claims {
+    sub: String,
+    exp: usize,
+    iat: usize,
+}
+
+fn generate_claims(sub: String) -> Result<Claims> {
+    let now = std::time::SystemTime::now();
+    let iat = now.duration_since(std::time::UNIX_EPOCH).unwrap().as_secs() as usize;
+
+    let token_life = std::time::Duration::from_secs(60 * 60 * 24 * 7); // 7 days
+    let exp = (now + token_life)
+        .duration_since(std::time::UNIX_EPOCH)?
+        .as_secs() as usize;
+
+    Ok(Claims { sub, exp, iat })
+}
+
+async fn generate_token(sub: String) -> Result<String> {
+    let priv_key = tokio::fs::read("keypair.der").await?;
+    let key = EncodingKey::from_ed_pem(&priv_key)?;
+
+    let claims = generate_claims(sub)?;
+    let header = Header::new(Algorithm::EdDSA);
+    let token = encode(&header, &claims, &key)?;
+
+    Ok(token)
+}
+
+/// Hashes a string using argon2.
+/// This is  performed on any password before it is stored in the database.
+async fn hash_string(data: &[u8]) -> Result<String> {
+    let salt = SaltString::generate(&mut OsRng);
+    let argon2 = Argon2::default();
+    let password_hash = argon2.hash_password(data, &salt)?.to_string();
+
+    Ok(password_hash)
+}
+
+async fn validate_hash(data: &[u8], secret: &str) -> Result<()> {
+    let password_hash = PasswordHash::new(secret).unwrap();
+    Argon2::default()
+        .verify_password(data, &password_hash)
+        .map_err(|_| {
+            tracing::debug!("Password verification failed");
+            Error::Unauthorized
+        })?;
+
+    Ok(())
+}
+
 /// Performs the signup process.
 /// This is where the user's credentials are added to the database.
 /// If the credentials are unique, the acount is created and a token is sent to the user.
-pub(crate) async fn signup(
-    dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
+pub(crate) async fn register(
+    State(ServerState { dynamodb, .. }): State<ServerState>,
     payload: axum::extract::Json<Credentials>,
 ) -> Result<axum::response::Json<AuthorizeResponse>> {
     // TODO: Check against database to see if the username is already taken.
 
-    let salt = SaltString::generate(&mut OsRng);
-    let argon2 = Argon2::default();
-    let password = payload.0.password.into_bytes();
-    let password_hash = argon2.hash_password(&password, &salt).unwrap().to_string();
+    let password_hash = hash_string(&payload.0.password.into_bytes()).await?;
 
     let user = User::builder()
         .identifier(payload.0.username)
@@ -43,66 +96,37 @@ pub(crate) async fn signup(
 
     tracing::info!(?res, "put item result");
 
+    let user_id = user.id.to_string();
+    let token = generate_token(user_id).await?;
+
     // for now, return a dummy token
-    Ok(axum::response::Json(AuthorizeResponse {
-        token: "dummy".to_string(),
-    }))
+    Ok(axum::response::Json(AuthorizeResponse { token }))
 }
 
 /// Performs the authorization process.
 /// This is where the user's credentials are checked against the database.
 /// If the credentials are valid, a token is generated and sent to the user.
 pub(crate) async fn authorize(
-    dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
+    State(ServerState { dynamodb, .. }): State<ServerState>,
     payload: axum::extract::Json<Credentials>,
 ) -> Result<axum::response::Json<AuthorizeResponse>> {
-    let input_credentials = payload.0;
+    let key = User::format_key(payload.0.username);
+    let res = User::get(&dynamodb, key)?.send().await?;
 
-    let client = &dynamodb.client;
-    // Query to find the user with the given username
-    let res = client
-        .query()
-        .table_name(&dynamodb.name)
-        .key_condition_expression("#pk = :pk AND #sk = :sk")
-        .expression_attribute_names("#pk", "pk")
-        .expression_attribute_names("#sk", "sk")
-        .expression_attribute_values(":pk", AttributeValue::S(User::PREFIX.to_string()))
-        .expression_attribute_values(
-            ":sk",
-            AttributeValue::S(format!("{}#{}", User::PREFIX, input_credentials.username)),
-        )
-        .send()
-        .await?;
-
-    match res.count() {
-        0 => {
+    match res.item() {
+        None => {
             tracing::debug!("No user found with the given username");
             Err(Error::Unauthorized)
         }
-        1 => {
-            let user = res.items().unwrap()[0].clone();
-            let user: User = serde_dynamo::from_item(user).unwrap();
-            tracing::debug!(?user, "user found");
+        Some(item) => {
+            let user: User = serde_dynamo::from_item(item.to_owned())?;
+            tracing::debug!(?user.id, "user found");
 
-            let password_hash = PasswordHash::new(&user.secret).unwrap();
-            Argon2::default()
-                .verify_password(input_credentials.password.as_bytes(), &password_hash)
-                .map_err(|_| {
-                    tracing::debug!("Password verification failed");
-                    Error::Unauthorized
-                })?;
-
+            validate_hash(payload.0.password.as_bytes(), &user.secret).await?;
             tracing::debug!("password verified");
 
-            // for now, return a dummy token
-            Ok(axum::response::Json(AuthorizeResponse {
-                token: "dummy".to_string(),
-            }))
-        }
-        _ => {
-            // should not be possible
-            tracing::error!("Multiple users found with the same username");
-            Err(Error::Unauthorized)
+            let token = generate_token(user.id.to_string()).await?;
+            Ok(axum::response::Json(AuthorizeResponse { token }))
         }
     }
 }

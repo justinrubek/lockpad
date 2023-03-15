@@ -19,3 +19,5 @@ tower = { version = "0.4", features = ["util"] }
 tower-http = { version = "0.3.0", features = ["fs", "cors"] }
 tracing = { workspace = true }
 argon2 = { version = "0.4.1", features = ["std"] }
+jsonwebtoken = { version = "8.2.0", features = ["use_pem"] }
+base64 = "0.21.0"
