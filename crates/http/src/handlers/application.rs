@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use crate::error::Result;
-use axum::Json;
+use crate::{error::Result, ServerState};
+use axum::{extract::State, Json};
 use lockpad_models::{
     application::{Application, Builder as ApplicationBuilder},
     entity::Builder,
@@ -10,7 +10,7 @@ use scylla_dynamodb::entity::{PrimaryId, PutEntity, QueryEntity};
 
 /// Performs a dynamodb query to list all users.
 pub(crate) async fn list_applications(
-    dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
+    State(ServerState { dynamodb, .. }): State<ServerState>,
     // owner_id: axum::extract::Path<PrimaryId>,
 ) -> Result<Json<Vec<Application>>> {
     let owner_id = PrimaryId::from_str("01GV6VJZ9N5FYYX9XC3VA50N3C")?;
@@ -37,7 +37,7 @@ pub struct CreateApplication {
 }
 
 pub(crate) async fn create_application(
-    dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
+    State(ServerState { dynamodb, .. }): State<ServerState>,
     payload: axum::extract::Json<CreateApplication>,
 ) -> Result<Json<Application>> {
     // For now, use a dummy owner_id.

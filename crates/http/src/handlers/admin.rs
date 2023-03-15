@@ -1,15 +1,18 @@
-use crate::error::Result;
+use crate::{error::Result, ServerState};
 use aws_sdk_dynamodb::model::AttributeValue;
-use axum::extract::Json;
+use axum::extract::{Json, State};
+use scylla_dynamodb::DynamodbTable;
 
 /// Performs a dynamodb query to list all users.
 pub(crate) async fn wipe_table(
-    dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
+    State(ServerState {
+        dynamodb: DynamodbTable { client, name },
+        ..
+    }): State<ServerState>,
 ) -> Result<()> {
     tracing::info!("Wiping table");
-    let client = &dynamodb.client;
 
-    let res = client.scan().table_name(&dynamodb.name).send().await?;
+    let res = client.scan().table_name(&name).send().await?;
 
     tracing::debug!(?res, "scan result");
 
@@ -22,7 +25,7 @@ pub(crate) async fn wipe_table(
 
         let res = client
             .delete_item()
-            .table_name(&dynamodb.name)
+            .table_name(&name)
             .key("pk", AttributeValue::S(pk.to_string()))
             .key("sk", AttributeValue::S(sk.to_string()))
             .send()
@@ -35,12 +38,15 @@ pub(crate) async fn wipe_table(
 }
 
 pub(crate) async fn scan_table(
-    dynamodb: axum::extract::State<scylla_dynamodb::DynamodbTable>,
+    State(ServerState { dynamodb, .. }): State<ServerState>,
 ) -> Result<Json<Vec<serde_json::Value>>> {
     tracing::info!("Scanning table");
-    let client = &dynamodb.client;
-
-    let res = client.scan().table_name(&dynamodb.name).send().await?;
+    let res = dynamodb
+        .client
+        .scan()
+        .table_name(&dynamodb.name)
+        .send()
+        .await?;
 
     // Scan all items from dynamodb, and return them as a list of JSON objects
     let items = res.items().map(|slice| slice.to_vec()).unwrap();

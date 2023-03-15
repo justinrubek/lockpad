@@ -21,8 +21,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match args.command {
         Commands::Server(server) => {
             let cmd = server.command;
-            let server =
-                lockpad_http::Server::new(server.addr, dynamo_client, table_name.to_string());
+
+            // TODO: Pass in the keypair instead of reading from disk
+            let jwt_secret = tokio::fs::read("secret.pem").await?;
+            let jwt_public = tokio::fs::read("public.pem").await?;
+
+            let server = lockpad_http::Server::builder()
+                .addr(server.addr)
+                .client(dynamo_client.clone())
+                .table_name(table_name.to_string())
+                .jwt_secret(jwt_secret)
+                .jwt_public(jwt_public)
+                .build()?;
 
             match cmd {
                 ServerCommands::Http => server.run().await?,
@@ -35,12 +45,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             match cmd {
                 KeyCommands::Generate => {
                     let keypair = ed25519_compact::KeyPair::generate();
+                    let secret = keypair.sk.to_der();
+                    let public = keypair.pk.to_der();
 
                     let mut file = std::fs::File::create("secret.der")?;
-                    file.write_all(&keypair.sk.to_der())?;
+                    file.write_all(&secret)?;
 
                     let mut file = std::fs::File::create("public.der")?;
-                    file.write_all(&keypair.pk.to_der())?;
+                    file.write_all(&public)?;
                 }
             }
         }
