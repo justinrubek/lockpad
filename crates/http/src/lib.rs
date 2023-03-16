@@ -2,6 +2,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use lockpad_auth::PublicKey;
 use std::net::SocketAddr;
 
 pub mod error;
@@ -29,12 +30,12 @@ pub struct Server {
 pub struct ServerState {
     pub dynamodb: scylla_dynamodb::DynamodbTable,
     pub encoding_key: jsonwebtoken::EncodingKey,
-    pub public_key: handlers::jwks::PublicKey,
+    pub public_key: PublicKey,
 }
 
 impl Server {
     pub fn builder() -> Builder {
-        Builder::new()
+        Builder::default()
     }
 
     pub async fn run(self) -> Result<()> {
@@ -44,8 +45,11 @@ impl Server {
             name: self.table_name,
             client: self.client,
         };
-        let encoding_key = jsonwebtoken::EncodingKey::from_secret(&self.jwt_secret);
-        let public_key = crate::handlers::jwks::PublicKey(self.jwt_public);
+
+        // let encoding_key = jsonwebtoken::EncodingKey::from_secret(&self.jwt_secret);
+        let encoding_key = jsonwebtoken::EncodingKey::from_ec_der(&self.jwt_secret);
+
+        let public_key = PublicKey::new(self.jwt_public)?;
         let state = ServerState {
             dynamodb,
             encoding_key,
@@ -143,6 +147,12 @@ impl Builder {
 
 impl Default for Builder {
     fn default() -> Self {
-        Self::new()
+        Self {
+            addr: Some(SocketAddr::from(([0, 0, 0, 0], 3000))),
+            client: None,
+            table_name: None,
+            jwt_secret: None,
+            jwt_public: None,
+        }
     }
 }
