@@ -14,6 +14,7 @@ scylla-dynamodb = { path = "../scylla-dynamodb" }
 serde = { workspace = true }
 serde_dynamo = { workspace = true }
 serde_json = { workspace = true }
+lockpad-auth = { path = "../auth" }
 lockpad-http = { path = "../http" }
 lockpad-models = { path = "../models" }
 tokio = { workspace = true }
@@ -21,4 +22,6 @@ tracing = { workspace = true }
 tracing-subscriber = "0.3.16"
 clap = { version = "4.1.6", features = ["derive"] }
 aws-sdk-dynamodb = { workspace = true }
-ed25519-compact = { version = "2.0.4", features = ["ed25519"] }
+jsonwebtoken.workspace = true
+rsa = "0.8.2"
+rand = "0.8.5"

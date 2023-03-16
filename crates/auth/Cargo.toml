@@ -1,0 +1,14 @@
+[package]
+name = "lockpad-auth"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+axum = { workspace = true, features = ["headers"] }
+base64 = "0.21.0"
+jsonwebtoken = { workspace = true }
+rsa = "0.8.2"
+serde.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
