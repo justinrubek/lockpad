@@ -5,16 +5,13 @@ use axum::{
     http::request::Parts,
     response::{IntoResponse, Response},
 };
-use base64::Engine;
-use jsonwebtoken::{
-    encode,
-    jwk::{AlgorithmParameters, RSAKeyParameters},
-    Algorithm, DecodingKey, EncodingKey, Header,
-};
-use rsa::{pkcs1::DecodeRsaPublicKey, PublicKeyParts};
+use jsonwebtoken::{encode, Algorithm, DecodingKey, EncodingKey, Header};
 use serde::{Deserialize, Serialize};
 
 pub mod error;
+pub mod key;
+
+pub use key::PublicKey;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Claims {
@@ -52,66 +49,6 @@ impl Claims {
         let claims = jsonwebtoken::decode::<Self>(token, key, &validation)?;
 
         Ok(claims.claims)
-    }
-}
-
-/// The binary representation of an Ed25519 public key
-/// This is used to verify JWT claims
-#[derive(Clone)]
-pub struct PublicKey {
-    raw: Vec<u8>,
-    key: DecodingKey,
-    rsa_key: rsa::RsaPublicKey,
-}
-
-impl PublicKey {
-    /// Create a new public key from a binary DER representation
-    pub fn new(raw: Vec<u8>) -> Result<Self> {
-        let contents = raw.clone();
-        let str = std::str::from_utf8(&contents)?;
-        Ok(Self {
-            key: DecodingKey::from_rsa_pem(&raw)?,
-            raw,
-            rsa_key: rsa::RsaPublicKey::from_pkcs1_pem(str)?,
-        })
-    }
-}
-
-impl From<PublicKey> for jsonwebtoken::jwk::Jwk {
-    fn from(key: PublicKey) -> Self {
-        let common = jsonwebtoken::jwk::CommonParameters {
-            public_key_use: Some(jsonwebtoken::jwk::PublicKeyUse::Signature),
-            key_id: Some("1".to_string()),
-            algorithm: Some(Algorithm::RS256),
-            ..Default::default()
-        };
-
-        let n = key.rsa_key.n().to_bytes_be();
-        let e = key.rsa_key.e().to_bytes_be();
-
-        let engine = base64::engine::general_purpose::URL_SAFE_NO_PAD;
-        let n_base64 = engine.encode(n);
-        let e_base64 = engine.encode(e);
-
-        let algorithm = AlgorithmParameters::RSA(RSAKeyParameters {
-            key_type: jsonwebtoken::jwk::RSAKeyType::RSA,
-            n: n_base64,
-            e: e_base64,
-        });
-
-        jsonwebtoken::jwk::Jwk { common, algorithm }
-    }
-}
-
-impl AsRef<[u8]> for PublicKey {
-    fn as_ref(&self) -> &[u8] {
-        &self.raw
-    }
-}
-
-impl AsRef<DecodingKey> for PublicKey {
-    fn as_ref(&self) -> &DecodingKey {
-        &self.key
     }
 }
 

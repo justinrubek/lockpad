@@ -1,7 +1,6 @@
 [workspace]
-members = ["crates/*"]
+members = ["crates/*", "examples/*"]
 resolver = "2"
-exclude = ["example"]
 
 [workspace.package]
 version = "0.1.0"

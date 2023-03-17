@@ -8,6 +8,12 @@ pub enum Error {
     Utf8Error(#[from] std::str::Utf8Error),
     #[error(transparent)]
     RsaPkcs1Error(#[from] rsa::pkcs1::Error),
+    #[error(transparent)]
+    RsaError(#[from] rsa::errors::Error),
+    #[error(transparent)]
+    JsonError(#[from] serde_json::Error),
+    #[error(transparent)]
+    DecodeError(#[from] base64::DecodeError),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
