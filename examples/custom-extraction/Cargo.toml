@@ -1,0 +1,14 @@
+[package]
+name = "example-custom-extraction"
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+axum.workspace = true
+lockpad-auth = { path = "../../crates/auth" }
+lockpad-http = { path = "../../crates/http" }
+reqwest = { version = "0.11.14", default-features = false, features = ["rustls-tls", "json"] }
+tokio = { workspace = true }
+tower = { version = "0.4", features = ["util"] }
+tower-http = { version = "0.3.0", features = ["fs", "cors"] }
+tracing = { workspace = true }

@@ -45,6 +45,7 @@
         root = ../.;
         include = [
           "crates"
+          "examples"
           "Cargo.toml"
           "Cargo.lock"
         ];
