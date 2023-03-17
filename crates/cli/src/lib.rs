@@ -1,3 +1,4 @@
+pub mod config;
 // An opinionated table creation function.
 // Creates a table with composite keys pk and sk
 pub async fn create_table(
