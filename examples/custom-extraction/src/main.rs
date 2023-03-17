@@ -16,7 +16,7 @@ async fn main() -> Result<()> {
     // load the public key from the auth server
     let client = reqwest::Client::new();
     let res = client
-        .get(format!("{}/.well-known/jwks.json", auth_url))
+        .get(format!("{auth_url}/.well-known/jwks.json"))
         .send()
         .await
         .unwrap();

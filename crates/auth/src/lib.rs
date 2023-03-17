@@ -13,6 +13,7 @@ pub mod key;
 
 pub use key::PublicKey;
 
+/// The claims of a JWT
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Claims {
     pub sub: String,
