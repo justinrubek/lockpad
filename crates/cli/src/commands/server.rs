@@ -1,3 +1,4 @@
+use lockpad::config::Config;
 use lockpad::create_table;
 use tracing::info;
 
@@ -18,20 +19,18 @@ pub(crate) enum ServerCommands {
 
 impl ServerCommand {
     pub(crate) async fn run(&self) -> Result<(), Box<dyn std::error::Error>> {
-        // TODO: load configuration from env or at least a specified file
-        let table_name = "lockpad-test-1";
-        let dynamo_client =
-            scylla_dynamodb::connect_dynamodb("http://localhost:8100".to_string()).await;
-        create_table_if_not_exists(&dynamo_client, table_name).await?;
-        let jwt_secret = tokio::fs::read("secret-rsa.pem").await?;
-        let jwt_public = tokio::fs::read("public-rsa.pem").await?;
+        let config = Config::load()?;
+        info!(?config, "loaded configuration");
+
+        let dynamo_client = scylla_dynamodb::connect_dynamodb(config.dynamodb_endpoint).await;
+        create_table_if_not_exists(&dynamo_client, &config.dynamodb_table).await?;
 
         let server = lockpad_http::Server::builder()
             .addr(self.addr)
             .client(dynamo_client.clone())
-            .table_name(table_name.to_string())
-            .jwt_secret(jwt_secret)
-            .jwt_public(jwt_public)
+            .table_name(config.dynamodb_table)
+            .jwt_secret(config.secret_key.as_bytes().to_owned())
+            .jwt_public(config.public_key.as_bytes().to_owned())
             .build()?;
 
         match self.command {
