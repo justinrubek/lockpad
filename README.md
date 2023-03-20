@@ -12,3 +12,14 @@ This is still being fleshed out, but is already useful for prototyping.
 The primary development dependency is [nix](https://nixos.org/), with the project being bundled as a nix flake.
 
 For tips on using the provided development environment, see [`HACKING.md`](HACKING.md).
+
+
+### running
+
+The authentication service can be ran: `cargo run --bin lockpad-cli server http`.
+You'll need to configure environment variables for:
+
+- DynamoDB connection and table information
+- Secret/public keys
+
+The provided cli can be used to generate keys: `cargo run --bin lockpad-cli -- --help`
