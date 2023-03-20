@@ -11,9 +11,9 @@ use scylla_dynamodb::entity::{PrimaryId, PutEntity, QueryEntity};
 /// Performs a dynamodb query to list all users.
 pub(crate) async fn list_applications(
     State(ServerState { dynamodb, .. }): State<ServerState>,
-    // owner_id: axum::extract::Path<PrimaryId>,
+    claims: lockpad_auth::Claims,
 ) -> Result<Json<Vec<Application>>> {
-    let owner_id = PrimaryId::from_str("01GV6VJZ9N5FYYX9XC3VA50N3C")?;
+    let owner_id = PrimaryId::from_str(&claims.sub)?;
 
     let res = Application::query(&dynamodb, owner_id)?.send().await?;
 
@@ -38,10 +38,10 @@ pub struct CreateApplication {
 
 pub(crate) async fn create_application(
     State(ServerState { dynamodb, .. }): State<ServerState>,
+    claims: lockpad_auth::Claims,
     payload: axum::extract::Json<CreateApplication>,
 ) -> Result<Json<Application>> {
-    // For now, use a dummy owner_id.
-    let owner_id = PrimaryId::new();
+    let owner_id = PrimaryId::from_str(&claims.sub)?;
 
     let item = ApplicationBuilder::default()
         .name(payload.0.name.to_owned())
