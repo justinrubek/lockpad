@@ -7,7 +7,6 @@ use argon2::{
     Argon2,
 };
 use axum::extract::State;
-use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 use lockpad_auth::Claims;
 use lockpad_models::{entity::Builder, user::User};
 use scylla_dynamodb::entity::{FormatKey, GetEntity, PutEntity};
@@ -22,29 +21,6 @@ pub(crate) struct Credentials {
 #[derive(Debug, Serialize)]
 pub(crate) struct AuthorizeResponse {
     token: String,
-}
-
-fn generate_claims(sub: String) -> Result<Claims> {
-    let now = std::time::SystemTime::now();
-    let iat = now.duration_since(std::time::UNIX_EPOCH).unwrap().as_secs() as usize;
-
-    let token_life = std::time::Duration::from_secs(60 * 60 * 24 * 7); // 7 days
-    let exp = (now + token_life)
-        .duration_since(std::time::UNIX_EPOCH)?
-        .as_secs() as usize;
-
-    Ok(Claims { sub, exp, iat })
-}
-
-async fn generate_token(sub: String) -> Result<String> {
-    let priv_key = tokio::fs::read("secret-rsa.pem").await?;
-    let key = EncodingKey::from_rsa_pem(&priv_key)?;
-
-    let claims = generate_claims(sub)?;
-    let header = Header::new(Algorithm::RS256);
-    let token = encode(&header, &claims, &key)?;
-
-    Ok(token)
 }
 
 /// Hashes a string using argon2.
@@ -105,7 +81,11 @@ pub(crate) async fn register(
 /// This is where the user's credentials are checked against the database.
 /// If the credentials are valid, a token is generated and sent to the user.
 pub(crate) async fn authorize(
-    State(ServerState { dynamodb, .. }): State<ServerState>,
+    State(ServerState {
+        dynamodb,
+        encoding_key,
+        ..
+    }): State<ServerState>,
     payload: axum::extract::Json<Credentials>,
 ) -> Result<axum::response::Json<AuthorizeResponse>> {
     let key = User::format_key(payload.0.username);
@@ -123,7 +103,9 @@ pub(crate) async fn authorize(
             validate_hash(payload.0.password.as_bytes(), &user.secret).await?;
             tracing::debug!("password verified");
 
-            let token = generate_token(user.id.to_string()).await?;
+            let token = Claims::new(user.id.to_string())
+                .encode(&encoding_key)
+                .await?;
             Ok(axum::response::Json(AuthorizeResponse { token }))
         }
     }

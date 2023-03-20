@@ -33,6 +33,12 @@ pub struct ServerState {
     pub public_key: PublicKey,
 }
 
+impl AsRef<PublicKey> for ServerState {
+    fn as_ref(&self) -> &PublicKey {
+        &self.public_key
+    }
+}
+
 impl Server {
     pub fn builder() -> Builder {
         Builder::default()
@@ -45,10 +51,7 @@ impl Server {
             name: self.table_name,
             client: self.client,
         };
-
-        // let encoding_key = jsonwebtoken::EncodingKey::from_secret(&self.jwt_secret);
-        let encoding_key = jsonwebtoken::EncodingKey::from_ec_der(&self.jwt_secret);
-
+        let encoding_key = jsonwebtoken::EncodingKey::from_rsa_pem(&self.jwt_secret)?;
         let public_key = PublicKey::new(self.jwt_public)?;
         let state = ServerState {
             dynamodb,
