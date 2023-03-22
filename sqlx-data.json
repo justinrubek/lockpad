@@ -1,21 +1,48 @@
 {
   "db": "PostgreSQL",
-  "6ffcbf973d6d06371aa5822e09eecf5d2d3eb7142c921376471777ed14a0da9e": {
+  "3240b9626b4fb2586ce1a56b6b532705cab0b988e9ed3cfe6dc22f2c972eec2b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      }
+    },
+    "query": "INSERT INTO users (name, secret) VALUES ($1, $2)"
+  },
+  "32bf346678e11a694e1f42c27cd6f8759141c8be9fb1b572bc1fe2d69d3fd5e8": {
     "describe": {
       "columns": [
         {
-          "name": "name",
+          "name": "user_id: Ulid",
           "ordinal": 0,
-          "type_info": "Text"
+          "type_info": "Uuid"
         }
       ],
       "nullable": [
-        false
+        null
       ],
       "parameters": {
         "Left": []
       }
     },
-    "query": "SELECT name FROM users"
+    "query": "SELECT user_id::UUID as \"user_id: Ulid\" FROM users"
+  },
+  "39f1f6d4ae1e11fb2d23ee9ab1ffa4cbce731b67ea96421bf328afe6294a42b0": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n        INSERT INTO \n            users(user_id, name, secret)\n        SELECT user_id::uuid, name, secret\n        FROM(\n            VALUES($1, $2, $3)\n        ) AS data(user_id, name, secret)\n        "
   }
 }
