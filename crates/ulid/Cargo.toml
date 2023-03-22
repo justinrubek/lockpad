@@ -1,0 +1,14 @@
+[package]
+name = "lockpad-ulid"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+rusty_ulid = { version = "2.0.0", features = ["chrono", "rand", "serde"], default-features = false }
+sqlx = { version = "0.6.3", features = ["offline", "runtime-tokio-rustls", "postgres", "time", "macros", "uuid"] }
+# serde.workspace = true
+# serde_json = "1.0.87"
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
