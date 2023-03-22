@@ -1,0 +1,21 @@
+{
+  "db": "PostgreSQL",
+  "6ffcbf973d6d06371aa5822e09eecf5d2d3eb7142c921376471777ed14a0da9e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "name",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT name FROM users"
+  }
+}

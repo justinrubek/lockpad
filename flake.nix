@@ -21,6 +21,13 @@
       url = "github:justinrubek/bomper";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    pgx-ulid = {
+      url = "github:justinrubek/pgx_ulid";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.fenix.follows = "fenix";
+      inputs.crane.follows = "crane";
+      inputs.flake-parts.follows = "flake-parts";
+    };
   };
 
   outputs = inputs:

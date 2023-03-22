@@ -20,6 +20,7 @@
       pkgs.cargo-audit
       pkgs.cargo-udeps
       pkgs.bacon
+      pkgs.sqlx-cli
       # version control
       pkgs.cocogitto
       inputs'.bomper.packages.cli
@@ -48,6 +49,7 @@
           "examples"
           "Cargo.toml"
           "Cargo.lock"
+          "sqlx-data.json"
         ];
       };
 
@@ -55,6 +57,7 @@
 
       nativeBuildInputs = withExtraPackages [];
       LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath nativeBuildInputs;
+      SQLX_OFFLINE = true;
     };
 
     deps-only = craneLib.buildDepsOnly ({} // common-build-args);
