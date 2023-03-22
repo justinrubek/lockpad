@@ -1,43 +1,32 @@
 use crate::{error::Result, ServerState};
 use axum::{extract::State, Json};
 use lockpad_models::user;
-use scylla_dynamodb::entity::{FormatKey, GetEntity, QueryEntity};
+use lockpad_ulid::Ulid;
 
-/// Performs a dynamodb query to list all users.
 pub(crate) async fn list_users(
-    State(ServerState { dynamodb, .. }): State<ServerState>,
+    State(ServerState { pg_pool, .. }): State<ServerState>,
 ) -> Result<Json<Vec<user::User>>> {
-    let res = user::User::query(&dynamodb, ())?.send().await?;
+    let pagination = lockpad_models::Pagination {
+        last_key: None,
+        count: 10,
+    };
 
-    tracing::debug!(?res, "query result");
+    let (users, _pagination) = user::User::query(&pg_pool, pagination).await?;
 
-    let items = res.items().map(|slice| slice.to_vec()).unwrap();
-
-    let users = items
-        .into_iter()
-        .map(|item| {
-            let user: user::User = serde_dynamo::from_item(item).unwrap();
-            user
-        })
-        .collect::<Vec<_>>();
+    tracing::debug!(?users, "query result");
 
     Ok(Json(users))
 }
 
 pub(crate) async fn get_user(
-    State(ServerState { dynamodb, .. }): State<ServerState>,
-    user_id: axum::extract::Path<String>,
+    State(ServerState { pg_pool, .. }): State<ServerState>,
+    user_id: axum::extract::Path<Ulid>,
 ) -> Result<Json<user::User>> {
-    let user_id = user_id.to_string();
     tracing::info!(?user_id, "getting user");
 
-    let key = user::User::format_key(user_id);
-
-    let res = user::User::get(&dynamodb, key)?.send().await?;
-
-    tracing::info!(?res, "query result");
-
-    let item = res.item().unwrap();
-
-    Ok(Json(serde_dynamo::from_item(item.to_owned()).unwrap()))
+    let user = user::User::by_id(&pg_pool, &user_id.0).await?;
+    match user {
+        Some(user) => Ok(Json(user)),
+        None => Err(crate::error::Error::NotFound),
+    }
 }

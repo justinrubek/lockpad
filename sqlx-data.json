@@ -1,37 +1,110 @@
 {
   "db": "PostgreSQL",
-  "3240b9626b4fb2586ce1a56b6b532705cab0b988e9ed3cfe6dc22f2c972eec2b": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text"
-        ]
-      }
-    },
-    "query": "INSERT INTO users (name, secret) VALUES ($1, $2)"
-  },
-  "32bf346678e11a694e1f42c27cd6f8759141c8be9fb1b572bc1fe2d69d3fd5e8": {
+  "33d53411577dc9e48601e17049be99cc2f3261b462ba46ef58f43dcd521ac796": {
     "describe": {
       "columns": [
         {
           "name": "user_id: Ulid",
           "ordinal": 0,
           "type_info": "Uuid"
+        },
+        {
+          "name": "identifier",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "secret",
+          "ordinal": 2,
+          "type_info": "Text"
         }
       ],
       "nullable": [
-        null
+        null,
+        false,
+        false
       ],
       "parameters": {
         "Left": []
       }
     },
-    "query": "SELECT user_id::UUID as \"user_id: Ulid\" FROM users"
+    "query": "\n            SELECT\n                user_id::uuid as \"user_id: Ulid\", identifier, secret\n            FROM \n                users\n            "
   },
-  "39f1f6d4ae1e11fb2d23ee9ab1ffa4cbce731b67ea96421bf328afe6294a42b0": {
+  "9cce7d736639343ea8c812be33947abeac7449035c2e2a72fd744bbe778700b9": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id: Ulid",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "identifier",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "secret",
+          "ordinal": 2,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        null,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n            SELECT\n                user_id::uuid as \"user_id: Ulid\", identifier, secret\n            FROM \n                users\n            WHERE \n                identifier = $1\n            "
+  },
+  "ada9aec09600b0a7d0b12f0ece47e10ff0a4c0096695cd2c0039dd3ea3317991": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id: Ulid",
+          "ordinal": 0,
+          "type_info": {
+            "Custom": {
+              "kind": "Simple",
+              "name": "ulid"
+            }
+          }
+        },
+        {
+          "name": "identifier",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "secret",
+          "ordinal": 2,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          {
+            "Custom": {
+              "kind": "Simple",
+              "name": "ulid"
+            }
+          }
+        ]
+      }
+    },
+    "query": "\n            SELECT\n                user_id as \"user_id: Ulid\", identifier, secret\n            FROM \n                users\n            WHERE \n                user_id = $1\n            "
+  },
+  "fadd5f5af5c5bfcb9364f188401424af576b80fedc0979739589770ac7a35cf3": {
     "describe": {
       "columns": [],
       "nullable": [],
@@ -43,6 +116,6 @@
         ]
       }
     },
-    "query": "\n        INSERT INTO \n            users(user_id, name, secret)\n        SELECT user_id::uuid, name, secret\n        FROM(\n            VALUES($1, $2, $3)\n        ) AS data(user_id, name, secret)\n        "
+    "query": "\n            INSERT INTO \n                users(user_id, identifier, secret)\n            SELECT \n                user_id::uuid, identifier, secret\n            FROM(\n                VALUES($1, $2, $3)\n            ) AS data(user_id, identifier, secret)\n            "
   }
 }

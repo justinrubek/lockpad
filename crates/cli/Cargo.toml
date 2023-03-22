@@ -26,3 +26,4 @@ aws-sdk-dynamodb = { workspace = true }
 jsonwebtoken.workspace = true
 rsa = "0.8.2"
 rand = "0.8.5"
+sqlx = "0.6.3"

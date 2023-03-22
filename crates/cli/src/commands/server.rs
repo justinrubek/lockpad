@@ -20,13 +20,18 @@ pub(crate) enum ServerCommands {
 impl ServerCommand {
     pub(crate) async fn run(&self) -> Result<(), Box<dyn std::error::Error>> {
         let config = Config::load()?;
-        info!(?config, "loaded configuration");
+
+        let pg_pool = sqlx::postgres::PgPoolOptions::new()
+            .max_connections(5)
+            .connect(&config.postgres_url)
+            .await?;
 
         let dynamo_client = scylla_dynamodb::connect_dynamodb(config.dynamodb_endpoint).await;
         create_table_if_not_exists(&dynamo_client, &config.dynamodb_table).await?;
 
         let server = lockpad_http::Server::builder()
             .addr(self.addr)
+            .pg_pool(pg_pool)
             .client(dynamo_client.clone())
             .table_name(config.dynamodb_table)
             .jwt_secret(config.secret_key.as_bytes().to_owned())
