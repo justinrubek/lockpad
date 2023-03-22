@@ -17,6 +17,9 @@ use handlers::{
 
 pub struct Server {
     addr: SocketAddr,
+
+    pg_pool: sqlx::pool::Pool<sqlx::Postgres>,
+
     client: aws_sdk_dynamodb::Client,
     table_name: String,
 
@@ -28,6 +31,7 @@ pub struct Server {
 
 #[derive(Clone)]
 pub struct ServerState {
+    pub pg_pool: sqlx::pool::Pool<sqlx::Postgres>,
     pub dynamodb: scylla_dynamodb::DynamodbTable,
     pub encoding_key: jsonwebtoken::EncodingKey,
     pub public_key: PublicKey,
@@ -54,6 +58,7 @@ impl Server {
         let encoding_key = jsonwebtoken::EncodingKey::from_rsa_pem(&self.jwt_secret)?;
         let public_key = PublicKey::new(self.jwt_public)?;
         let state = ServerState {
+            pg_pool: self.pg_pool,
             dynamodb,
             encoding_key,
             public_key,
@@ -89,6 +94,7 @@ impl Server {
 
 pub struct Builder {
     addr: Option<SocketAddr>,
+    pg_pool: Option<sqlx::pool::Pool<sqlx::Postgres>>,
     client: Option<aws_sdk_dynamodb::Client>,
     table_name: Option<String>,
     jwt_secret: Option<Vec<u8>>,
@@ -99,6 +105,7 @@ impl Builder {
     pub fn new() -> Self {
         Self {
             addr: None,
+            pg_pool: None,
             client: None,
             table_name: None,
             jwt_secret: None,
@@ -108,6 +115,11 @@ impl Builder {
 
     pub fn addr(mut self, addr: SocketAddr) -> Self {
         self.addr = Some(addr);
+        self
+    }
+
+    pub fn pg_pool(mut self, pg_pool: sqlx::pool::Pool<sqlx::Postgres>) -> Self {
+        self.pg_pool = Some(pg_pool);
         self
     }
 
@@ -133,6 +145,7 @@ impl Builder {
 
     pub fn build(self) -> Result<Server> {
         let addr = self.addr.ok_or(error::Error::ServerBuilder)?;
+        let pg_pool = self.pg_pool.ok_or(error::Error::ServerBuilder)?;
         let client = self.client.ok_or(error::Error::ServerBuilder)?;
         let table_name = self.table_name.ok_or(error::Error::ServerBuilder)?;
         let jwt_secret = self.jwt_secret.ok_or(error::Error::ServerBuilder)?;
@@ -140,6 +153,7 @@ impl Builder {
 
         Ok(Server {
             addr,
+            pg_pool,
             client,
             table_name,
             jwt_secret,
@@ -152,6 +166,7 @@ impl Default for Builder {
     fn default() -> Self {
         Self {
             addr: Some(SocketAddr::from(([0, 0, 0, 0], 3000))),
+            pg_pool: None,
             client: None,
             table_name: None,
             jwt_secret: None,

@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct Config {
     // database
+    pub postgres_url: String,
     pub dynamodb_endpoint: String,
     pub dynamodb_table: String,
 

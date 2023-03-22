@@ -9,7 +9,6 @@ use argon2::{
 use axum::extract::State;
 use lockpad_auth::Claims;
 use lockpad_models::{entity::Builder, user::User};
-use scylla_dynamodb::entity::{FormatKey, GetEntity, PutEntity};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
@@ -50,8 +49,8 @@ async fn validate_hash(data: &[u8], secret: &str) -> Result<()> {
 /// If the credentials are unique, the acount is created and a token is sent to the user.
 pub(crate) async fn register(
     State(ServerState {
-        dynamodb,
         encoding_key,
+        pg_pool,
         ..
     }): State<ServerState>,
     payload: axum::extract::Json<Credentials>,
@@ -66,11 +65,9 @@ pub(crate) async fn register(
         .build()?;
 
     tracing::info!(?user, "creating user");
-    let res = user.put_item(&dynamodb)?.send().await?;
+    user.create(&pg_pool).await?;
 
-    tracing::info!(?res, "put item result");
-
-    let user_id = user.id.to_string();
+    let user_id = user.user_id.to_string();
     let token = Claims::new(user_id).encode(&encoding_key).await?;
 
     // for now, return a dummy token
@@ -82,28 +79,28 @@ pub(crate) async fn register(
 /// If the credentials are valid, a token is generated and sent to the user.
 pub(crate) async fn authorize(
     State(ServerState {
-        dynamodb,
         encoding_key,
+        pg_pool,
         ..
     }): State<ServerState>,
     payload: axum::extract::Json<Credentials>,
 ) -> Result<axum::response::Json<AuthorizeResponse>> {
-    let key = User::format_key(payload.0.username);
-    let res = User::get(&dynamodb, key)?.send().await?;
+    let user = User::by_identifier(&pg_pool, &payload.0.username).await?;
 
-    match res.item() {
+    match user {
         None => {
-            tracing::debug!("No user found with the given username");
+            tracing::debug!("user not found");
+
             Err(Error::Unauthorized)
         }
-        Some(item) => {
-            let user: User = serde_dynamo::from_item(item.to_owned())?;
-            tracing::debug!(?user.id, "user found");
+        Some(user) => {
+            tracing::debug!(?user.user_id, "user found");
+            tracing::debug!(?user.user_id, "user found");
 
             validate_hash(payload.0.password.as_bytes(), &user.secret).await?;
             tracing::debug!("password verified");
 
-            let token = Claims::new(user.id.to_string())
+            let token = Claims::new(user.user_id.to_string())
                 .encode(&encoding_key)
                 .await?;
             Ok(axum::response::Json(AuthorizeResponse { token }))

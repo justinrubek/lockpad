@@ -42,6 +42,8 @@ pub enum Error {
 
     #[error("unauthorized")]
     Unauthorized,
+    #[error("not found")]
+    NotFound,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -51,6 +53,7 @@ impl axum::response::IntoResponse for Error {
         tracing::info!(?self, "error response");
         let status = match self {
             Error::Unauthorized => axum::http::StatusCode::UNAUTHORIZED,
+            Error::NotFound => axum::http::StatusCode::NOT_FOUND,
             _ => axum::http::StatusCode::INTERNAL_SERVER_ERROR,
         };
 
