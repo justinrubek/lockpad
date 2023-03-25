@@ -1,6 +1,4 @@
 use lockpad::config::Config;
-use lockpad::create_table;
-use tracing::info;
 
 #[derive(clap::Args, Debug)]
 pub(crate) struct ServerCommand {
@@ -26,14 +24,9 @@ impl ServerCommand {
             .connect(&config.postgres_url)
             .await?;
 
-        let dynamo_client = scylla_dynamodb::connect_dynamodb(config.dynamodb_endpoint).await;
-        create_table_if_not_exists(&dynamo_client, &config.dynamodb_table).await?;
-
         let server = lockpad_http::Server::builder()
             .addr(self.addr)
             .pg_pool(pg_pool)
-            .client(dynamo_client.clone())
-            .table_name(config.dynamodb_table)
             .jwt_secret(config.secret_key.as_bytes().to_owned())
             .jwt_public(config.public_key.as_bytes().to_owned())
             .build()?;
@@ -44,22 +37,4 @@ impl ServerCommand {
 
         Ok(())
     }
-}
-
-async fn create_table_if_not_exists(
-    client: &aws_sdk_dynamodb::Client,
-    table_name: &str,
-) -> Result<(), Box<dyn std::error::Error>> {
-    info!(?table_name, "checking if table exists");
-    let all_tables = client.list_tables().send().await?;
-    if !all_tables
-        .table_names()
-        .unwrap()
-        .contains(&table_name.to_string())
-    {
-        info!(?table_name, "table does not exist, creating");
-        create_table(client, table_name).await?;
-    }
-
-    Ok(())
 }

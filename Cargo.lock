@@ -1318,6 +1318,7 @@ dependencies = [
  "scylla-dynamodb",
  "serde",
  "serde_dynamo",
+ "serde_json",
  "sqlx",
  "thiserror",
  "tokio",

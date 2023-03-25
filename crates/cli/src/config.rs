@@ -4,8 +4,6 @@ use serde::{Deserialize, Serialize};
 pub struct Config {
     // database
     pub postgres_url: String,
-    pub dynamodb_endpoint: String,
-    pub dynamodb_table: String,
 
     // jwt keys
     pub secret_key: String,
