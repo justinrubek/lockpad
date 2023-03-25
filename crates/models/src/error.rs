@@ -2,6 +2,8 @@
 pub enum Error {
     #[error(transparent)]
     SerdeDynamo(#[from] serde_dynamo::Error),
+    #[error(transparent)]
+    SerdeJson(#[from] serde_json::Error),
 
     #[error(transparent)]
     DynamodbQuery(#[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::QueryError>),

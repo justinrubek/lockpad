@@ -1,5 +1,49 @@
 {
   "db": "PostgreSQL",
+  "028dde516bbdc239a020ecd7629decf95b7c4e1c7c239338aabaf34a392824da": {
+    "describe": {
+      "columns": [
+        {
+          "name": "application_id: Ulid",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "owner_id: Ulid",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "allowed_origins",
+          "ordinal": 3,
+          "type_info": "TextArray"
+        },
+        {
+          "name": "allowed_callback_urls",
+          "ordinal": 4,
+          "type_info": "TextArray"
+        }
+      ],
+      "nullable": [
+        null,
+        null,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n            SELECT\n                application_id::uuid as \"application_id: Ulid\",\n                owner_id::uuid as \"owner_id: Ulid\",\n                name,\n                allowed_origins,\n                allowed_callback_urls\n            FROM \n                applications\n            WHERE \n                application_id::uuid = $1\n            "
+  },
   "33d53411577dc9e48601e17049be99cc2f3261b462ba46ef58f43dcd521ac796": {
     "describe": {
       "columns": [
@@ -29,6 +73,107 @@
       }
     },
     "query": "\n            SELECT\n                user_id::uuid as \"user_id: Ulid\", identifier, secret\n            FROM \n                users\n            "
+  },
+  "45b7f0c08c50bdd318ff30690635e079b1e6f457267903f134e9186f12650c04": {
+    "describe": {
+      "columns": [
+        {
+          "name": "application_id: Ulid",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "owner_id: Ulid",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "allowed_origins",
+          "ordinal": 3,
+          "type_info": "TextArray"
+        },
+        {
+          "name": "allowed_callback_urls",
+          "ordinal": 4,
+          "type_info": "TextArray"
+        }
+      ],
+      "nullable": [
+        null,
+        null,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "\n            SELECT\n                application_id::uuid as \"application_id: Ulid\",\n                owner_id::uuid as \"owner_id: Ulid\",\n                name,\n                allowed_origins,\n                allowed_callback_urls\n            FROM \n                applications\n            "
+  },
+  "4edd1b6548ed6800c7b8de8d379898beaa8c8c7dd435edbb6ba9acf570c6f97c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "application_id: Ulid",
+          "ordinal": 0,
+          "type_info": {
+            "Custom": {
+              "kind": "Simple",
+              "name": "ulid"
+            }
+          }
+        },
+        {
+          "name": "owner_id: Ulid",
+          "ordinal": 1,
+          "type_info": {
+            "Custom": {
+              "kind": "Simple",
+              "name": "ulid"
+            }
+          }
+        },
+        {
+          "name": "name",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "allowed_origins",
+          "ordinal": 3,
+          "type_info": "TextArray"
+        },
+        {
+          "name": "allowed_callback_urls",
+          "ordinal": 4,
+          "type_info": "TextArray"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          {
+            "Custom": {
+              "kind": "Simple",
+              "name": "ulid"
+            }
+          }
+        ]
+      }
+    },
+    "query": "\n            SELECT\n                application_id as \"application_id: Ulid\", owner_id as \"owner_id: Ulid\", name, allowed_origins, allowed_callback_urls\n            FROM \n                applications\n            WHERE \n                owner_id = $1\n            "
   },
   "9cce7d736639343ea8c812be33947abeac7449035c2e2a72fd744bbe778700b9": {
     "describe": {

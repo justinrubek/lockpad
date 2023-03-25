@@ -20,9 +20,6 @@ pub struct Server {
 
     pg_pool: sqlx::pool::Pool<sqlx::Postgres>,
 
-    client: aws_sdk_dynamodb::Client,
-    table_name: String,
-
     /// The secret used to sign the JWT tokens.
     jwt_secret: Vec<u8>,
     /// The public key used to verify the JWT tokens.
@@ -32,7 +29,6 @@ pub struct Server {
 #[derive(Clone)]
 pub struct ServerState {
     pub pg_pool: sqlx::pool::Pool<sqlx::Postgres>,
-    pub dynamodb: scylla_dynamodb::DynamodbTable,
     pub encoding_key: jsonwebtoken::EncodingKey,
     pub public_key: PublicKey,
 }
@@ -51,15 +47,10 @@ impl Server {
     pub async fn run(self) -> Result<()> {
         let cors = tower_http::cors::CorsLayer::permissive();
 
-        let dynamodb = scylla_dynamodb::DynamodbTable {
-            name: self.table_name,
-            client: self.client,
-        };
         let encoding_key = jsonwebtoken::EncodingKey::from_rsa_pem(&self.jwt_secret)?;
         let public_key = PublicKey::new(self.jwt_public)?;
         let state = ServerState {
             pg_pool: self.pg_pool,
-            dynamodb,
             encoding_key,
             public_key,
         };
@@ -72,12 +63,14 @@ impl Server {
             .route("/signup", post(register))
             .route("/users", get(list_users))
             .route("/users/:user_id", get(get_user))
-            .route("/admin/wipe-table", get(handlers::admin::wipe_table))
-            .route("/admin/scan-table", get(handlers::admin::scan_table))
             .route(
                 "/applications",
                 get(handlers::application::list_applications)
                     .post(handlers::application::create_application),
+            )
+            .route(
+                "/applications/:application_id",
+                get(handlers::application::get_application),
             )
             .route("/.well-known/jwks.json", get(handlers::jwks::jwks))
             .with_state(state)
@@ -95,8 +88,6 @@ impl Server {
 pub struct Builder {
     addr: Option<SocketAddr>,
     pg_pool: Option<sqlx::pool::Pool<sqlx::Postgres>>,
-    client: Option<aws_sdk_dynamodb::Client>,
-    table_name: Option<String>,
     jwt_secret: Option<Vec<u8>>,
     jwt_public: Option<Vec<u8>>,
 }
@@ -106,8 +97,6 @@ impl Builder {
         Self {
             addr: None,
             pg_pool: None,
-            client: None,
-            table_name: None,
             jwt_secret: None,
             jwt_public: None,
         }
@@ -120,16 +109,6 @@ impl Builder {
 
     pub fn pg_pool(mut self, pg_pool: sqlx::pool::Pool<sqlx::Postgres>) -> Self {
         self.pg_pool = Some(pg_pool);
-        self
-    }
-
-    pub fn client(mut self, client: aws_sdk_dynamodb::Client) -> Self {
-        self.client = Some(client);
-        self
-    }
-
-    pub fn table_name(mut self, table_name: String) -> Self {
-        self.table_name = Some(table_name);
         self
     }
 
@@ -146,16 +125,12 @@ impl Builder {
     pub fn build(self) -> Result<Server> {
         let addr = self.addr.ok_or(error::Error::ServerBuilder)?;
         let pg_pool = self.pg_pool.ok_or(error::Error::ServerBuilder)?;
-        let client = self.client.ok_or(error::Error::ServerBuilder)?;
-        let table_name = self.table_name.ok_or(error::Error::ServerBuilder)?;
         let jwt_secret = self.jwt_secret.ok_or(error::Error::ServerBuilder)?;
         let jwt_public = self.jwt_public.ok_or(error::Error::ServerBuilder)?;
 
         Ok(Server {
             addr,
             pg_pool,
-            client,
-            table_name,
             jwt_secret,
             jwt_public,
         })
@@ -167,8 +142,6 @@ impl Default for Builder {
         Self {
             addr: Some(SocketAddr::from(([0, 0, 0, 0], 3000))),
             pg_pool: None,
-            client: None,
-            table_name: None,
             jwt_secret: None,
             jwt_public: None,
         }
