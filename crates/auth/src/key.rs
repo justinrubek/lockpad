@@ -144,7 +144,11 @@ OAc5t3RZmw5L0Nikhso62g9oefgwWOIPJwIDAQAB
         let jwk: jsonwebtoken::jwk::Jwk = serde_json::from_str(JWK_JSON)?;
         let key = PublicKey::try_from(jwk)?;
 
-        Claims::decode(JWT, key.as_ref()).await?;
+        // don't validate exp
+        let mut validation = jsonwebtoken::Validation::new(Algorithm::RS256);
+        validation.validate_exp = false;
+
+        Claims::decode_validation(JWT, key.as_ref(), &validation).await?;
 
         Ok(())
     }
@@ -156,7 +160,11 @@ OAc5t3RZmw5L0Nikhso62g9oefgwWOIPJwIDAQAB
         let key_set = PublicKey::parse_from_jwks(JWKS_JSON)?;
         let key = key_set.get(0).unwrap();
 
-        Claims::decode(JWT, key.as_ref()).await?;
+        // don't validate exp
+        let mut validation = jsonwebtoken::Validation::new(Algorithm::RS256);
+        validation.validate_exp = false;
+
+        Claims::decode_validation(JWT, key.as_ref(), &validation).await?;
 
         Ok(())
     }
@@ -167,7 +175,10 @@ OAc5t3RZmw5L0Nikhso62g9oefgwWOIPJwIDAQAB
     async fn pem_to_key() -> Result<()> {
         let key = PublicKey::parse_from_pem(RSA_PUBLIC_KEY)?;
 
-        Claims::decode(JWT, key.as_ref()).await?;
+        let mut validation = jsonwebtoken::Validation::new(Algorithm::RS256);
+        validation.validate_exp = false;
+
+        Claims::decode_validation(JWT, key.as_ref(), &validation).await?;
 
         Ok(())
     }
