@@ -1,6 +1,7 @@
 use lockpad_ulid::Ulid;
 use serde::{Deserialize, Serialize};
 
+pub mod api_key;
 pub mod application;
 pub mod entity;
 pub mod error;

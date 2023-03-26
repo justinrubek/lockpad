@@ -44,6 +44,44 @@
     },
     "query": "\n            SELECT\n                application_id::uuid as \"application_id: Ulid\",\n                owner_id::uuid as \"owner_id: Ulid\",\n                name,\n                allowed_origins,\n                allowed_callback_urls\n            FROM \n                applications\n            WHERE \n                application_id::uuid = $1\n            "
   },
+  "13ba7bfb3f1b046611a3ff65a918a3d6cec44ecb835be170aba86cbe539b0bb3": {
+    "describe": {
+      "columns": [
+        {
+          "name": "api_key_id: Ulid",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "owner_id: Ulid",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "secret",
+          "ordinal": 3,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        null,
+        null,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n            SELECT\n                api_key_id::uuid as \"api_key_id: Ulid\",\n                owner_id::uuid as \"owner_id: Ulid\",\n                name,\n                secret\n            FROM \n                api_keys\n            WHERE \n                api_key_id::uuid = $1\n            "
+  },
   "33d53411577dc9e48601e17049be99cc2f3261b462ba46ef58f43dcd521ac796": {
     "describe": {
       "columns": [
@@ -73,6 +111,59 @@
       }
     },
     "query": "\n            SELECT\n                user_id::uuid as \"user_id: Ulid\", identifier, secret\n            FROM \n                users\n            "
+  },
+  "3d1bd285c6555b0b94c7fc12749b98bba759f5830abd377d3b733d5f93edb5c1": {
+    "describe": {
+      "columns": [
+        {
+          "name": "api_key_id: Ulid",
+          "ordinal": 0,
+          "type_info": {
+            "Custom": {
+              "kind": "Simple",
+              "name": "ulid"
+            }
+          }
+        },
+        {
+          "name": "owner_id: Ulid",
+          "ordinal": 1,
+          "type_info": {
+            "Custom": {
+              "kind": "Simple",
+              "name": "ulid"
+            }
+          }
+        },
+        {
+          "name": "name",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "secret",
+          "ordinal": 3,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          {
+            "Custom": {
+              "kind": "Simple",
+              "name": "ulid"
+            }
+          }
+        ]
+      }
+    },
+    "query": "\n            SELECT\n                api_key_id as \"api_key_id: Ulid\", owner_id as \"owner_id: Ulid\", name, secret\n            FROM \n                api_keys\n            WHERE \n                owner_id = $1\n            "
   },
   "45b7f0c08c50bdd318ff30690635e079b1e6f457267903f134e9186f12650c04": {
     "describe": {
@@ -174,6 +265,42 @@
       }
     },
     "query": "\n            SELECT\n                application_id as \"application_id: Ulid\", owner_id as \"owner_id: Ulid\", name, allowed_origins, allowed_callback_urls\n            FROM \n                applications\n            WHERE \n                owner_id = $1\n            "
+  },
+  "652d4a106631a04a30e0cd8d4e6ae4e23cd74efa5f19ef414f3b2e53e91ff870": {
+    "describe": {
+      "columns": [
+        {
+          "name": "api_key_id: Ulid",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "owner_id: Ulid",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "secret",
+          "ordinal": 3,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        null,
+        null,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "\n            SELECT\n                api_key_id::uuid as \"api_key_id: Ulid\",\n                owner_id::uuid as \"owner_id: Ulid\",\n                name, secret\n            FROM \n                api_keys\n            "
   },
   "9cce7d736639343ea8c812be33947abeac7449035c2e2a72fd744bbe778700b9": {
     "describe": {

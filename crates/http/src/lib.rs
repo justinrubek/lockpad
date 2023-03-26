@@ -72,6 +72,11 @@ impl Server {
                 "/applications/:application_id",
                 get(handlers::application::get_application),
             )
+            .route(
+                "/api-keys",
+                get(handlers::api_key::list_api_keys).post(handlers::api_key::create_api_key),
+            )
+            .route("/api-keys/:api_key_id", get(handlers::api_key::get_api_key))
             .route("/.well-known/jwks.json", get(handlers::jwks::jwks))
             .with_state(state)
             .layer(cors);
