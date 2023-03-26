@@ -51,6 +51,16 @@ impl Claims {
 
         Ok(claims.claims)
     }
+
+    pub async fn decode_validation(
+        token: &str,
+        key: &DecodingKey,
+        validation: &jsonwebtoken::Validation,
+    ) -> Result<Self> {
+        let claims = jsonwebtoken::decode::<Self>(token, key, validation)?;
+
+        Ok(claims.claims)
+    }
 }
 
 #[axum::async_trait]
