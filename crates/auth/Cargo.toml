@@ -1,7 +1,10 @@
 [package]
 name = "lockpad-auth"
+description = "utilities for processing JWT claims"
 version.workspace = true
 edition.workspace = true
+repository.workspace = true
+license.workspace = true
 
 [dependencies]
 axum = { workspace = true, features = ["headers"] }
