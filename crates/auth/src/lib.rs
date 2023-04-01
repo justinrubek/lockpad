@@ -1,6 +1,6 @@
 use crate::error::Result;
 use axum::{
-    extract::{FromRequestParts, TypedHeader},
+    extract::{FromRef, FromRequestParts, TypedHeader},
     headers::{authorization::Bearer, Authorization},
     http::request::Parts,
     response::{IntoResponse, Response},
@@ -66,7 +66,8 @@ impl Claims {
 #[axum::async_trait]
 impl<S> FromRequestParts<S> for Claims
 where
-    S: Send + Sync + AsRef<PublicKey>,
+    S: Send + Sync,
+    key::PublicKey: axum::extract::FromRef<S>,
 {
     type Rejection = Response;
 
@@ -83,9 +84,9 @@ where
         println!("Got token: {}", token.token());
 
         // Verify the token
-        let key = state.as_ref(); // Get the public key from the state
-        let key = key.as_ref(); // Get the decoding key from the public key
-        let claims = Claims::decode(token.token(), key)
+        let key: PublicKey = FromRef::from_ref(state);
+        let key: DecodingKey = FromRef::from_ref(&key);
+        let claims = Claims::decode(token.token(), &key)
             .await
             .map_err(|err| err.into_response())?;
 

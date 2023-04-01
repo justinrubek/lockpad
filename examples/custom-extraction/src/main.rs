@@ -64,7 +64,8 @@ struct User {
 #[axum::async_trait]
 impl<S> FromRequestParts<S> for User
 where
-    S: Send + Sync + AsRef<PublicKey>,
+    S: Send + Sync,
+    lockpad_auth::PublicKey: axum::extract::FromRef<S>,
 {
     type Rejection = Response;
 
@@ -88,8 +89,9 @@ struct ServerState {
     public_key: PublicKey,
 }
 
-impl AsRef<PublicKey> for ServerState {
-    fn as_ref(&self) -> &PublicKey {
-        &self.public_key
+/// This is needed for the implementation of [FromRequestParts](axum::extract::FromRequestParts) on [Claims](lockpad_auth::Claims)
+impl axum::extract::FromRef<ServerState> for PublicKey {
+    fn from_ref(state: &ServerState) -> Self {
+        state.public_key.clone()
     }
 }

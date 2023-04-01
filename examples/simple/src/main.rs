@@ -53,8 +53,8 @@ struct ServerState {
 }
 
 /// This is needed for the implementation of [FromRequestParts](axum::extract::FromRequestParts) on [Claims](lockpad_auth::Claims)
-impl AsRef<PublicKey> for ServerState {
-    fn as_ref(&self) -> &PublicKey {
-        &self.public_key
+impl axum::extract::FromRef<ServerState> for PublicKey {
+    fn from_ref(state: &ServerState) -> Self {
+        state.public_key.clone()
     }
 }
