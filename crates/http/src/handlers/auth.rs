@@ -81,7 +81,7 @@ pub(crate) async fn register(
         .secret(password_hash)
         .build()?;
 
-    tracing::info!(?user, "creating user");
+    tracing::debug!(?user, "creating user");
     user.create(&pg_pool).await?;
 
     let user_id = user.user_id.to_string();
