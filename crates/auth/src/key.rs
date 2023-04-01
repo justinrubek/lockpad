@@ -1,4 +1,5 @@
 use crate::error::{Error, Result};
+use axum::extract::FromRef;
 use base64::Engine;
 use jsonwebtoken::{
     jwk::{AlgorithmParameters, RSAKeyParameters},
@@ -111,9 +112,9 @@ impl AsRef<[u8]> for PublicKey {
     }
 }
 
-impl AsRef<DecodingKey> for PublicKey {
-    fn as_ref(&self) -> &DecodingKey {
-        &self.key
+impl FromRef<PublicKey> for DecodingKey {
+    fn from_ref(key: &PublicKey) -> Self {
+        key.key.clone()
     }
 }
 

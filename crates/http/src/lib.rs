@@ -1,4 +1,5 @@
 use axum::{
+    extract::FromRef,
     routing::{get, post},
     Router,
 };
@@ -33,9 +34,9 @@ pub struct ServerState {
     pub public_key: PublicKey,
 }
 
-impl AsRef<PublicKey> for ServerState {
-    fn as_ref(&self) -> &PublicKey {
-        &self.public_key
+impl FromRef<ServerState> for PublicKey {
+    fn from_ref(state: &ServerState) -> Self {
+        state.public_key.clone()
     }
 }
 
