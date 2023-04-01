@@ -149,7 +149,8 @@ OAc5t3RZmw5L0Nikhso62g9oefgwWOIPJwIDAQAB
         let mut validation = jsonwebtoken::Validation::new(Algorithm::RS256);
         validation.validate_exp = false;
 
-        Claims::decode_validation(JWT, key.as_ref(), &validation).await?;
+        let key: jsonwebtoken::DecodingKey = axum::extract::FromRef::from_ref(&key);
+        Claims::decode_validation(JWT, &key, &validation).await?;
 
         Ok(())
     }
@@ -165,7 +166,8 @@ OAc5t3RZmw5L0Nikhso62g9oefgwWOIPJwIDAQAB
         let mut validation = jsonwebtoken::Validation::new(Algorithm::RS256);
         validation.validate_exp = false;
 
-        Claims::decode_validation(JWT, key.as_ref(), &validation).await?;
+        let key: jsonwebtoken::DecodingKey = axum::extract::FromRef::from_ref(key);
+        Claims::decode_validation(JWT, &key, &validation).await?;
 
         Ok(())
     }
@@ -179,7 +181,8 @@ OAc5t3RZmw5L0Nikhso62g9oefgwWOIPJwIDAQAB
         let mut validation = jsonwebtoken::Validation::new(Algorithm::RS256);
         validation.validate_exp = false;
 
-        Claims::decode_validation(JWT, key.as_ref(), &validation).await?;
+        let key: jsonwebtoken::DecodingKey = axum::extract::FromRef::from_ref(&key);
+        Claims::decode_validation(JWT, &key, &validation).await?;
 
         Ok(())
     }

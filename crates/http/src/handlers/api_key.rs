@@ -53,7 +53,7 @@ pub(crate) async fn create_api_key(
     // Overwrite the secret with the unhashed version. This is the only time we will return the secret.
     item.secret = secret;
 
-    tracing::info!(?item, "created api_key");
+    tracing::debug!(?item, "created api_key");
     Ok(Json(item))
 }
 

@@ -22,7 +22,7 @@ pub(crate) async fn get_user(
     State(ServerState { pg_pool, .. }): State<ServerState>,
     user_id: axum::extract::Path<Ulid>,
 ) -> Result<Json<user::User>> {
-    tracing::info!(?user_id, "getting user");
+    tracing::debug!(?user_id, "getting user");
 
     let user = user::User::by_id(&pg_pool, &user_id.0).await?;
     match user {

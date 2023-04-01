@@ -49,7 +49,7 @@ pub(crate) async fn create_application(
 
     item.create(&pg_pool).await?;
 
-    tracing::info!(?item, "created application");
+    tracing::debug!(?item, "created application");
     Ok(Json(item))
 }
 
