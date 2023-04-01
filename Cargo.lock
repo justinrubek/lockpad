@@ -730,7 +730,7 @@ checksum = "0206175f82b8d6bf6652ff7d71a1e27fd2e4efde587fd368662814d6ec1d9ce0"
 
 [[package]]
 name = "example-custom-extraction"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "axum",
  "lockpad-auth",
@@ -744,7 +744,7 @@ dependencies = [
 
 [[package]]
 name = "example-simple"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "axum",
  "lockpad-auth",
@@ -1239,7 +1239,7 @@ dependencies = [
 
 [[package]]
 name = "lockpad"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "aws-sdk-dynamodb",
  "clap",
@@ -1262,7 +1262,7 @@ dependencies = [
 
 [[package]]
 name = "lockpad-auth"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "axum",
  "base64 0.21.0",
@@ -1277,7 +1277,7 @@ dependencies = [
 
 [[package]]
 name = "lockpad-derive"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "quote",
  "syn",
@@ -1285,7 +1285,7 @@ dependencies = [
 
 [[package]]
 name = "lockpad-http"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "argon2",
  "aws-sdk-dynamodb",
@@ -1310,7 +1310,7 @@ dependencies = [
 
 [[package]]
 name = "lockpad-models"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "aws-sdk-dynamodb",
  "lockpad-derive",
@@ -1327,7 +1327,7 @@ dependencies = [
 
 [[package]]
 name = "lockpad-ulid"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "rusty_ulid",
@@ -2046,7 +2046,7 @@ dependencies = [
 
 [[package]]
 name = "scylla-dynamodb"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "aws-credential-types",
  "aws-sdk-dynamodb",
