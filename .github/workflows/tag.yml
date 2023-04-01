@@ -4,24 +4,6 @@ on:
     tags:
       - "*"
 jobs:
-  publish-github:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Determine version
-        id: get_version
-        uses: Simply007/get-version-action@v2
-
-      - name: create release
-        uses: actions/create-release@v1
-        id: create_release
-        with:
-          draft: false
-          prerelease: false
-          release_name: ${{ steps.get_version.outputs.version }}
-          tag_name: ${{ github.ref }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
   publish-crate:
     runs-on: ubuntu-latest
     steps:
