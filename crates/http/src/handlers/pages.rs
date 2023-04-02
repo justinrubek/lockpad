@@ -233,11 +233,16 @@ impl std::string::ToString for HtmlForm {
             HtmlFormType::Login => "Login",
         };
 
+        let submit_uri = &self.submit_uri;
         let form_name = format!("{}-form", type_name);
 
         let form_html = format!(
             r#"
-            <form id="{form_name}">
+            <form 
+                id="{form_name}"
+                action="{submit_uri}"
+                method="POST"
+            >
                 <input type="text" id="username" name="username" placeholder="username" />
                 <input type="password" id="password" name="password" placeholder="password" />
                 <input type="submit" value="{type_display}" />
@@ -245,49 +250,11 @@ impl std::string::ToString for HtmlForm {
         "#,
         );
 
-        let submit_uri = &self.submit_uri;
-
-        let script_html = format!(
-            r#"
-                <script>
-                    const form = document.getElementById("{form_name}");
-                    form.onsubmit = function(event) {{
-                        console.log("submitting form");
-                        event.preventDefault();
-                        const data = new FormData(form);
-                        const username = data.get("username");
-                        const password = data.get("password");
-
-                        // Perform a POST request to /authorize
-                        // If the request is successful, the s
-                        fetch("{submit_uri}", {{
-                            method: "POST",
-                            body: JSON.stringify({{ username, password }}),
-                            headers: {{
-                                "Content-Type": "application/json",
-                            }},
-                        }})
-                        .then(response => response.json())
-                        .then(data => {{
-                            console.log("Success:", data);
-                        }})
-                        .catch((error) => {{
-                            console.error("Error:", error);
-                        }});
-                    }}
-                </script>
-            "#
-        );
-
         format!(
             r#"
                 <h1>{type_display}</h1>
                 {form_html}
-                {script_html}
             "#,
-            type_display = type_display,
-            form_html = form_html,
-            script_html = script_html,
         )
     }
 }
