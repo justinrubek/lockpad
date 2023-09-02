@@ -81,8 +81,6 @@ where
                 .await
                 .map_err(|err| err.into_response())?;
 
-        println!("Got token: {}", token.token());
-
         // Verify the token
         let key: PublicKey = FromRef::from_ref(state);
         let key: DecodingKey = FromRef::from_ref(&key);

@@ -46,6 +46,11 @@ pub enum Error {
     Unauthorized,
     #[error("not found")]
     NotFound,
+
+    #[error(transparent)]
+    AxumFormRejection(#[from] axum::extract::rejection::FormRejection),
+    #[error(transparent)]
+    ValidationError(#[from] validator::ValidationErrors),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -56,6 +61,13 @@ impl axum::response::IntoResponse for Error {
         let status = match self {
             Error::Unauthorized => axum::http::StatusCode::UNAUTHORIZED,
             Error::NotFound => axum::http::StatusCode::NOT_FOUND,
+
+            Error::AxumFormRejection(_) => axum::http::StatusCode::BAD_REQUEST,
+            Error::ValidationError(_) => {
+                let message = format!("input validation error: [{self}]").replace('\n', ", ");
+                return (axum::http::StatusCode::BAD_REQUEST, message).into_response();
+            }
+
             _ => axum::http::StatusCode::INTERNAL_SERVER_ERROR,
         };
 
