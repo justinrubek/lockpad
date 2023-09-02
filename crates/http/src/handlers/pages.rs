@@ -29,9 +29,9 @@ pub(crate) async fn login_screen(
         None => return HtmlPage::NoParams,
         Some(query) => query.0,
     };
-    tracing::info!("login screen query: {:?}", params);
+    tracing::debug!("login screen query: {:?}", params);
 
-    // TODO: Lookup the client_id as the application_id and determine if the redirect_uri is valid.
+    // Lookup the client_id as the application_id and determine if the redirect_uri and origins are valid.
     // If the client_id is not valid, return an error.
     // If the redirect_uri is not valid, return an error.
     let app_id = Ulid::from_str(&params.client_id).unwrap();
@@ -40,7 +40,17 @@ pub(crate) async fn login_screen(
         Ok(None) => return HtmlPage::InvalidParams,
         Ok(Some(application)) => application,
     };
-    tracing::info!("application: {:?}", application);
+    tracing::debug!("application: {:?}", application);
+
+    // compare the redirect_uri to application.redirect_uris
+    if !application
+        .allowed_callback_urls
+        .contains(&params.redirect_uri)
+    {
+        return HtmlPage::InvalidParams;
+    }
+
+    // TODO: compare the origin to application.allowed_origins
 
     HtmlPage::Form(HtmlForm::login("/authorize".to_string()))
 }

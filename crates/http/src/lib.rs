@@ -8,6 +8,7 @@ use std::net::SocketAddr;
 
 pub mod error;
 pub mod handlers;
+pub mod validation;
 
 use error::Result;
 use handlers::{
@@ -146,7 +147,7 @@ impl Builder {
 impl Default for Builder {
     fn default() -> Self {
         Self {
-            addr: Some(SocketAddr::from(([0, 0, 0, 0], 3000))),
+            addr: Some(SocketAddr::from(([0, 0, 0, 0], 5000))),
             pg_pool: None,
             jwt_secret: None,
             jwt_public: None,

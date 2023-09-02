@@ -5,7 +5,7 @@ pub(crate) struct ServerCommand {
     #[clap(subcommand)]
     pub command: ServerCommands,
 
-    #[arg(default_value = "0.0.0.0:3000", long, short)]
+    #[arg(default_value = "0.0.0.0:5000", long, short)]
     pub addr: std::net::SocketAddr,
 }
 

@@ -45,12 +45,6 @@ pub(crate) struct AuthorizeResponse {
     token: String,
 }
 
-#[derive(Debug, Deserialize)]
-pub(crate) struct ApplicationParams {
-    pub redirect_uri: String,
-    pub client_id: String,
-}
-
 /// Hashes a string using argon2.
 /// This is  performed on any password before it is stored in the database.
 pub(crate) async fn hash_string(data: &[u8]) -> Result<String> {
@@ -101,7 +95,7 @@ pub(crate) async fn register(
 
     // for now, return a dummy token
     Ok(Redirect::found(&format!(
-        "http://localhost:4000/?token={token}"
+        "http://localhost:3000/login-callback?token={token}"
     )))
 }
 
@@ -121,7 +115,7 @@ pub(crate) async fn authorize(
         Credentials::User(_) => {
             let token = payload.authorize(&encoding_key, &pg_pool).await?;
             Ok(Redirect::found(&format!(
-                "http://localhost:4000/?token={token}"
+                "http://localhost:3000/login-callback?token={token}"
             )))
         }
         Credentials::ApiKey(_) => {
@@ -131,6 +125,7 @@ pub(crate) async fn authorize(
 }
 
 /// Performs the authorization process, but with JSON request bodies.
+#[allow(dead_code)]
 pub(crate) async fn authorize_json(
     State(ServerState {
         encoding_key,
