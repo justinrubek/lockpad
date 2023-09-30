@@ -28,6 +28,8 @@
       inputs.crane.follows = "crane";
       inputs.flake-parts.follows = "flake-parts";
     };
+    process-compose.url = "github:Platonic-Systems/process-compose-flake";
+    services-flake.url = "github:justinrubek/services-flake";
   };
 
   outputs = inputs:
@@ -41,6 +43,9 @@
         ./flake-parts/pre-commit.nix
         ./flake-parts/postgres.nix
         ./flake-parts/scylla.nix
+
+        inputs.process-compose.flakeModule
+        ./flake-parts/services.nix
       ];
     };
 }
