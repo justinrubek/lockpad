@@ -935,6 +935,21 @@
         "type": "github"
       }
     },
+    "process-compose": {
+      "locked": {
+        "lastModified": 1695992918,
+        "narHash": "sha256-5tHNbk0ldLUjAqKRZog/3asiVvkD51VGK9TvwzUBs38=",
+        "owner": "Platonic-Systems",
+        "repo": "process-compose-flake",
+        "rev": "1ebecb83f15736f5d4ae3feb01a8391977dd71da",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Platonic-Systems",
+        "repo": "process-compose-flake",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "bomper": "bomper",
@@ -944,7 +959,9 @@
         "nix-filter": "nix-filter_3",
         "nixpkgs": "nixpkgs_3",
         "pgx-ulid": "pgx-ulid",
-        "pre-commit-hooks": "pre-commit-hooks_3"
+        "pre-commit-hooks": "pre-commit-hooks_3",
+        "process-compose": "process-compose",
+        "services-flake": "services-flake"
       }
     },
     "rust-analyzer-src": {
@@ -1098,6 +1115,21 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "services-flake": {
+      "locked": {
+        "lastModified": 1696470497,
+        "narHash": "sha256-HRtlixYGWQiXag4Sgbk4jP1yYMDPeQpiG0gy+Y+1L3o=",
+        "owner": "justinrubek",
+        "repo": "services-flake",
+        "rev": "7c0f55c5e4efc06ddaf15945b523d0536ee70c74",
+        "type": "github"
+      },
+      "original": {
+        "owner": "justinrubek",
+        "repo": "services-flake",
         "type": "github"
       }
     },
