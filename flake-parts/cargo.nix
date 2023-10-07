@@ -27,10 +27,6 @@
       # database
       self'.packages.postgresql
       pkgs.pgcli
-      self'.packages."scripts/init-database"
-      self'.packages."scripts/start-database"
-      self'.packages."scripts/stop-database"
-      self'.packages."scripts/run-scylla"
       # misc
     ];
 
