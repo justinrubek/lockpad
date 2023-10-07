@@ -5,7 +5,7 @@ result*
 target
 
 .tmp
-.s.PGSQL.5432.lock
+.data
 
 secret.pem
 public.pem
