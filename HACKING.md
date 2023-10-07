@@ -10,20 +10,25 @@ Create this directory and place individual files per variable into it.
 Name each file after the corresponding variable name, and the file contents will be loaded and watched by direnv.
 The configuration matches the `Config` struct in `crates/cli/src/config.rs`, with `LOCKPAD_` being prefixed to the names.
 
-## Postgres
+## services
 
-The flake's devShell includes postgres, allowing you to have a project-specific database for development.
-The shell has scripts to make it easier to manage the database: `init-database`, `start-database`, and `stop-database`.
-The scripts will create a database in `./tmp`, allowing you start and stop running it as your local user.
+As a convenience the flake is equipped with [services-flake](https://github.com/justinrubek/services-flake) to provide an interface for the services needed for local development.
+To launch services use `nix run .#services` and [process-compose](https://github.com/F1bonacc1/process-compose) will start.
 
-To get started, run `init-database` to create a new database.
-You can connect to it using `psql -h $PWD -d test-db`.
+### Postgres
 
-To stop the database, run `stop-database`.
-To start it again: `start-database`.
+The flake's package output includes postgres, allowing you to access the pinned version directly if needed.
 
-## ScyllaDB
+Migrations are managed using sqlx, see the [sqlx-cli usage page](https://github.com/launchbadge/sqlx/blob/main/sqlx-cli/README.md#usage=) for information on how to use it.
 
-ScyllaDB doesn't build in nix at the time of writing so it has been included in the form of a script which runs a docker container.
-After running the script (`run-scylla` or `nix run .#run-scylla), a container will be launched and should be managed manually using docker.
-You may connect to Alternator through `"http://localhost:8100"`.
+Common commands:
+- `sqlx migrate add <name>`
+- `sqlx migrate run`
+- `sqlx migrate revert`
+
+
+### pre-commit-hooks
+
+The devShell has been equipped with a pre-commit hook that prepares sqlx to ensure type-checking can be performed.
+This is especially important to do because we don't have a database available to check against in the build environment.
+You'll need to ensure you have the `DATABASE_URL` environment variable set. You can make it a symlink to `LOCKPAD_POSTGRES_URL` or manually keep them in sync.
