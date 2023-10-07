@@ -80,6 +80,7 @@ impl Server {
             )
             .route("/api-keys/:api_key_id", get(handlers::api_key::get_api_key))
             .route("/.well-known/jwks.json", get(handlers::jwks::jwks))
+            .route("/health", get(handlers::health::health))
             .with_state(state)
             .layer(cors);
 
