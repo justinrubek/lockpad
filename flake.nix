@@ -46,6 +46,8 @@
 
         inputs.process-compose.flakeModule
         ./flake-parts/services.nix
+
+        ./containers
       ];
     };
 }
