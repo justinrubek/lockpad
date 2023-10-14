@@ -72,6 +72,24 @@
             Volumes = {"/data" = {};};
           };
         };
+
+      "lockpad/docker" = pkgs.dockerTools.buildImage {
+        name = "lockpad";
+        tag = self.rev or "dirty";
+
+        copyToRoot = pkgs.buildEnv {
+          name = "image-root";
+          paths = [
+            self'.packages.cli
+          ];
+          pathsToLink = ["/bin"];
+        };
+
+        config = {
+          Cmd = ["/bin/lockpad-cli"];
+          WorkingDir = "/app";
+        };
+      };
     };
   };
 }
