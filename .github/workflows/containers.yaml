@@ -10,7 +10,7 @@ on:
         description: the container registry name
 
 jobs:
-  publish-ghcr:
+  publish-container:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

@@ -18,7 +18,7 @@
       pkgs.cargo-udeps
       pkgs.cargo-nextest
       pkgs.bacon
-      pkgs.wasm-bindgen-cli
+      pkgs.sqlx-cli
       # version control
       pkgs.cocogitto
       inputs'.bomper.packages.cli

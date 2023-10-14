@@ -38,9 +38,14 @@
       imports = [
         inputs.pre-commit-hooks.flakeModule
 
+        ./flake-parts/shells.nix
+        ./flake-parts/ci.nix
+
         ./flake-parts/cargo.nix
         ./flake-parts/rust-toolchain.nix
+
         ./flake-parts/pre-commit.nix
+
         ./flake-parts/postgres.nix
         ./flake-parts/scylla.nix
 
