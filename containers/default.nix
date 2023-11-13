@@ -81,8 +81,10 @@
           name = "image-root";
           paths = [
             self'.packages.cli
+            self'.packages.sqlx-cli
+            self'.packages.sqlx-migrations
           ];
-          pathsToLink = ["/bin"];
+          pathsToLink = ["/bin" "/migrations"];
         };
 
         config = {
