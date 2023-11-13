@@ -8,7 +8,7 @@
     lib,
     ...
   }: let
-    inherit (self'.packages) rust-toolchain;
+    inherit (self'.packages) rust-toolchain sqlx-cli sqlx-migrations;
     inherit (self'.legacyPackages) cargoExtraPackages ciPackages;
 
     devTools = [
@@ -18,13 +18,15 @@
       pkgs.cargo-udeps
       pkgs.cargo-nextest
       pkgs.bacon
-      pkgs.sqlx-cli
       # version control
       pkgs.cocogitto
       inputs'.bomper.packages.cli
       # database
       self'.packages.postgresql
       pkgs.pgcli
+      sqlx-cli
+      sqlx-migrations
+
       # misc
       pkgs.skopeo
     ];

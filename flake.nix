@@ -47,6 +47,7 @@
         ./flake-parts/pre-commit.nix
 
         ./flake-parts/postgres.nix
+        ./flake-parts/sqlx.nix
         ./flake-parts/scylla.nix
 
         inputs.process-compose.flakeModule
