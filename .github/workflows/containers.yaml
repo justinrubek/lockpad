@@ -12,6 +12,9 @@ on:
 jobs:
   publish-container:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v3
 
@@ -35,13 +38,13 @@ jobs:
 
       - name: login to registry
         env:
-          USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-          PASSWORD: ${{ secrets.DOCKER_HUB_TOKEN }}
-        run: echo ${PASSWORD} | nix develop .#ci -c skopeo login docker.io -u ${USERNAME} --password-stdin
+          USERNAME: ${{ github.actor }}
+          PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: echo ${PASSWORD} | nix develop .#ci -c skopeo login ghcr.io -u ${USERNAME} --password-stdin
 
       - name: push to registry
         env:
           REPO_OWNER: justinrubek
           REPO_NAME: ${{ inputs.repository_name }}
           VERSION: ${{ github.sha }}
-        run: nix develop .#ci -c skopeo copy docker-archive:result docker://${REPO_OWNER}/${REPO_NAME}:${VERSION} --insecure-policy
+        run: nix develop .#ci -c skopeo copy docker-archive:result docker://ghcr.io/${REPO_OWNER}/${REPO_NAME}:${VERSION} --insecure-policy
