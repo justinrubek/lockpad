@@ -125,7 +125,6 @@ pub(crate) async fn authorize(
 }
 
 /// Performs the authorization process, but with JSON request bodies.
-#[allow(dead_code)]
 pub(crate) async fn authorize_json(
     State(ServerState {
         encoding_key,
@@ -154,7 +153,6 @@ async fn authorize_user(
             Err(Error::Unauthorized)
         }
         Some(user) => {
-            tracing::debug!(?user.user_id, "user found");
             tracing::debug!(?user.user_id, "user found");
 
             validate_hash(payload.password.as_bytes(), &user.secret).await?;

@@ -12,7 +12,7 @@ pub mod validation;
 
 use error::Result;
 use handlers::{
-    auth::{authorize, register},
+    auth::{authorize, authorize_json, register},
     pages::{login_screen, root, signup_screen},
     user::{get_user, list_users},
 };
@@ -62,6 +62,7 @@ impl Server {
             .route("/login", get(login_screen))
             .route("/signup-screen", get(signup_screen))
             .route("/authorize", post(authorize))
+            .route("/api/authorize", post(authorize_json))
             .route("/signup", post(register))
             .route("/users", get(list_users))
             .route("/users/:user_id", get(get_user))
