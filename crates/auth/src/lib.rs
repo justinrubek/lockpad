@@ -1,9 +1,12 @@
 use crate::error::Result;
 use axum::{
-    extract::{FromRef, FromRequestParts, TypedHeader},
-    headers::{authorization::Bearer, Authorization},
+    extract::{FromRef, FromRequestParts},
     http::request::Parts,
     response::{IntoResponse, Response},
+};
+use axum_extra::{
+    headers::{authorization::Bearer, Authorization},
+    TypedHeader,
 };
 use jsonwebtoken::{encode, Algorithm, DecodingKey, EncodingKey, Header};
 use serde::{Deserialize, Serialize};

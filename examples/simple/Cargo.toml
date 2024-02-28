@@ -10,5 +10,5 @@ lockpad-http = { path = "../../crates/http" }
 reqwest = { version = "0.11.14", default-features = false, features = ["rustls-tls", "json"] }
 tokio = { workspace = true }
 tower = { version = "0.4", features = ["util"] }
-tower-http = { version = "0.3.0", features = ["fs", "cors"] }
+tower-http = { version = "0.5", features = ["fs", "cors"] }
 tracing = { workspace = true }

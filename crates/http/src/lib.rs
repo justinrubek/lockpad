@@ -5,6 +5,7 @@ use axum::{
 };
 use lockpad_auth::PublicKey;
 use std::net::SocketAddr;
+use tokio::net::TcpListener;
 
 pub mod error;
 pub mod handlers;
@@ -86,9 +87,8 @@ impl Server {
             .layer(cors);
 
         tracing::info!("Listening on {0}", self.addr);
-        axum::Server::bind(&self.addr)
-            .serve(app.into_make_service())
-            .await?;
+        let listener = TcpListener::bind(&self.addr).await?;
+        axum::serve(listener, app).await?;
 
         Ok(())
     }
