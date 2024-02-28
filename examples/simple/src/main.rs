@@ -5,6 +5,7 @@ use axum::{
 use lockpad_auth::PublicKey;
 use lockpad_http::error::Result;
 use std::net::SocketAddr;
+use tokio::net::TcpListener;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -32,9 +33,8 @@ async fn main() -> Result<()> {
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     println!("Listening on {addr}");
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await?;
+    let listener = TcpListener::bind(&addr).await?;
+    axum::serve(listener, app).await?;
 
     Ok(())
 }

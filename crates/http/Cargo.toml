@@ -6,7 +6,7 @@ edition = { workspace = true }
 [dependencies]
 axum.workspace = true
 aws-sdk-dynamodb = { workspace = true }
-hyper = "0.14.24"
+hyper = "1.0"
 jsonwebtoken = { workspace = true }
 lockpad-models = { path = "../models" }
 lockpad-auth = { path = "../auth" }
@@ -18,7 +18,7 @@ scylla-dynamodb = { path = "../scylla-dynamodb" }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tower = { version = "0.4", features = ["util"] }
-tower-http = { version = "0.3.0", features = ["fs", "cors"] }
+tower-http = { version = "0.5", features = ["fs", "cors"] }
 tracing = { workspace = true }
 argon2 = { version = "0.4.1", features = ["std"] }
 base64 = "0.21.0"
