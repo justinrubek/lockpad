@@ -3,25 +3,39 @@ members = ["crates/*", "examples/*"]
 resolver = "2"
 
 [workspace.package]
-version = "0.2.0"
 edition = "2021"
-license = "MIT"
 homepage = "https://github.com/justinrubek/lockpad"
+license = "MIT"
 repository = "https://github.com/justinrubek/lockpad"
+version = "0.3.0"
 
 [workspace.dependencies]
-axum = "0.7"
-axum-extra = "0.9"
 anyhow = "1.0.68"
 aws-sdk-dynamodb = "0.24.0"
-serde = { version = "1", features = ["derive"] }
-serde_dynamo = { version = "4.0.12", features = ["aws-sdk-dynamodb+0_24"] }
+axum = "0.7"
+axum-extra = "0.9"
 serde_json = "1.0.87"
-tokio = { version = "1", features = ["full"] }
-jsonwebtoken = { version = "8.2.0", features = ["use_pem"] }
 thiserror = "1.0.38"
 tracing = "0.1.37"
-ulid = { version = "1.0.0", features = ["serde"] }
 
-[profile.release]
-# opt-level = 2 # fast and small wasm
+[workspace.dependencies.jsonwebtoken]
+version = "8.2.0"
+features = ["use_pem"]
+
+[workspace.dependencies.serde]
+version = "1"
+features = ["derive"]
+
+[workspace.dependencies.serde_dynamo]
+version = "4.0.12"
+features = ["aws-sdk-dynamodb+0_24"]
+
+[workspace.dependencies.tokio]
+version = "1"
+features = ["full"]
+
+[workspace.dependencies.ulid]
+version = "1.0.0"
+features = ["serde"]
+
+[profile.release.package]

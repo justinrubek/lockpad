@@ -22,6 +22,41 @@ All notable changes to this project will be documented in this file. See [conven
 - convert user model to postgres - ([330a9e0](https://github.com/justinrubek/lockpad/commit/330a9e0e83cd34d0021688221ce2a0e83aec2981)) - [@justinrubek](https://github.com/justinrubek)
 
 - - -
+## [0.3.0](https://github.com/justinrubek/lockpad/compare/0.2.0..0.3.0) - 2024-02-29
+#### Build system
+- **(cargo)** update axum to 0.7 - ([c9cd7fa](https://github.com/justinrubek/lockpad/commit/c9cd7fa3d9f03b707a092cd061f7d430aa5e52e5)) - [@justinrubek](https://github.com/justinrubek)
+- **(cargo)** cargo update - ([320f90f](https://github.com/justinrubek/lockpad/commit/320f90f342a23dc67d44939b6f805003d1ee1c6f)) - [@justinrubek](https://github.com/justinrubek)
+- **(deps)** bump webpki from 0.22.1 to 0.22.4 - ([2aef69d](https://github.com/justinrubek/lockpad/commit/2aef69db1bc82ab9c2ad2943c5bd235e7c7930a9)) - dependabot[bot]
+- **(nix)** update nixpkgs, pgx-ulid - ([3c27c12](https://github.com/justinrubek/lockpad/commit/3c27c12cb773a7d3d6ec13ba1d9397b83eda42bb)) - [@justinrubek](https://github.com/justinrubek)
+- **(nix)** update many inputs - ([56b9d16](https://github.com/justinrubek/lockpad/commit/56b9d1694c7e0c7e0cbab5b1b2d7aa3a511a97f3)) - [@justinrubek](https://github.com/justinrubek)
+- **(nix)** update fenix input - ([34a23bb](https://github.com/justinrubek/lockpad/commit/34a23bb65aecdf46fa337b59f06d9c91ee7d9841)) - [@justinrubek](https://github.com/justinrubek)
+#### Continuous Integration
+- **(github)** remove github release step - ([03a7c27](https://github.com/justinrubek/lockpad/commit/03a7c2774ee87a72d31cf0b2dbc7113c18d6ff33)) - [@justinrubek](https://github.com/justinrubek)
+- **(github)** attempt to fixup action - ([8b764c8](https://github.com/justinrubek/lockpad/commit/8b764c8ca7988f2015ef541a00ac7714b74e0a73)) - [@justinrubek](https://github.com/justinrubek)
+- **(github/actions)** rename container build - ([216e0fb](https://github.com/justinrubek/lockpad/commit/216e0fbbbbc2465973cec975638b46f56907e310)) - [@justinrubek](https://github.com/justinrubek)
+- **(github/actions)** add container build action - ([12b62d6](https://github.com/justinrubek/lockpad/commit/12b62d61f0068043ca466e1773d945624e2e8bc1)) - [@justinrubek](https://github.com/justinrubek)
+- switch from docker.io to ghcr.io - ([7c616f4](https://github.com/justinrubek/lockpad/commit/7c616f47cd7bbef564c6b034516f247199084fb1)) - [@justinrubek](https://github.com/justinrubek)
+#### Documentation
+- **(hacking.md)** outline instructions for using services - ([d7dfcd1](https://github.com/justinrubek/lockpad/commit/d7dfcd18d41b891f159fa8707fafd697b68b2c41)) - [@justinrubek](https://github.com/justinrubek)
+#### Features
+- **(containers)** provide migrations in lockpad image - ([9894cb3](https://github.com/justinrubek/lockpad/commit/9894cb3c643c7b183f234143b8c22f22a1e76629)) - [@justinrubek](https://github.com/justinrubek)
+- **(containers)** lockpad/docker package - ([eab3614](https://github.com/justinrubek/lockpad/commit/eab3614ce092ee4fa325a129759240147a56a974)) - [@justinrubek](https://github.com/justinrubek)
+- **(flake-parts)** add ci devShell - ([61f5b21](https://github.com/justinrubek/lockpad/commit/61f5b21830144f6f7c1030180fe25e7fad1b051c)) - [@justinrubek](https://github.com/justinrubek)
+- **(http)** add /health route - ([99bc557](https://github.com/justinrubek/lockpad/commit/99bc557310580451b57b0de2a2272a1035edbe57)) - [@justinrubek](https://github.com/justinrubek)
+- add /api/authorize JSON route - ([98d2a49](https://github.com/justinrubek/lockpad/commit/98d2a49e2b3f6833281ac2b76c2230d03e535c4b)) - [@justinrubek](https://github.com/justinrubek)
+- build container image for postgres - ([2cade95](https://github.com/justinrubek/lockpad/commit/2cade95b05fe35e2e8c6acd802b394948e8fbdf4)) - [@justinrubek](https://github.com/justinrubek)
+- add services-flake for process-compose - ([f2fce9a](https://github.com/justinrubek/lockpad/commit/f2fce9aa24b3e1600cd4d1335ae34369d095340c)) - [@justinrubek](https://github.com/justinrubek)
+- login form validation - ([f7d1239](https://github.com/justinrubek/lockpad/commit/f7d123905031208085b3b01193efc6b415d3237c)) - [@justinrubek](https://github.com/justinrubek)
+- added HtmlPage struct - ([9a0b993](https://github.com/justinrubek/lockpad/commit/9a0b99399f61760472e6e007b18e1c48983462c6)) - [@justinrubek](https://github.com/justinrubek)
+#### Miscellaneous Chores
+- remove postgres scripts - ([ec15764](https://github.com/justinrubek/lockpad/commit/ec157641315f6730ee5cbacccee6d5d206e32a7f)) - [@justinrubek](https://github.com/justinrubek)
+- update .gitignore - ([52411dd](https://github.com/justinrubek/lockpad/commit/52411dd160fe4de0cdb57182f64ad161765ed371)) - [@justinrubek](https://github.com/justinrubek)
+- add cargo metadata - ([0bb7460](https://github.com/justinrubek/lockpad/commit/0bb7460d2d01f32a6b4d8dff5f14dccc95354ee3)) - [@justinrubek](https://github.com/justinrubek)
+#### Refactoring
+- Removed javascript from form submission - ([182ef56](https://github.com/justinrubek/lockpad/commit/182ef5685048a8a559f493e385af91e681c65fc3)) - [@justinrubek](https://github.com/justinrubek)
+
+- - -
+
 
 ## [0.1.0](https://github.com/justinrubek/lockpad/compare/5507daafaef71a2a89bf33a33277782eacfa1c97..0.1.0) - 2023-04-01
 #### Build system
