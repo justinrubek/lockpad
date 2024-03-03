@@ -18,7 +18,8 @@
 
     global-imports = [
       ({name, ...}: {
-        dataDir = "\$PRJ_DATA_HOME/${name}";
+        dataDirEnv = "\${PRJ_DATA_HOME}/${name}";
+        socketDirEnv = "\${PRJ_DATA_HOME}/${name}/sockets";
       })
     ];
   in rec {
