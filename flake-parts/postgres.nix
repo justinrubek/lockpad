@@ -8,7 +8,7 @@
     ...
   }: {
     packages = {
-      postgresql = pkgs.postgresql_15.withPackages (ps: [inputs'.pgx-ulid.packages.pgx_ulid]);
+      postgresql = inputs'.nix-postgres.packages."psql_15/bin";
     };
   };
 }
