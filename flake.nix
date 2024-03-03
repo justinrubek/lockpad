@@ -30,6 +30,7 @@
     };
     process-compose.url = "github:Platonic-Systems/process-compose-flake";
     services-flake.url = "github:justinrubek/services-flake";
+    nix-postgres.url = "github:justinrubek/nix-postgres";
   };
 
   outputs = inputs:
