@@ -1121,11 +1121,11 @@
     },
     "services-flake": {
       "locked": {
-        "lastModified": 1696470497,
-        "narHash": "sha256-HRtlixYGWQiXag4Sgbk4jP1yYMDPeQpiG0gy+Y+1L3o=",
+        "lastModified": 1709450333,
+        "narHash": "sha256-/vRN/z7exx/Fs9lAMCJlsFuPJXr/wdFtOlK5NzwVlhQ=",
         "owner": "justinrubek",
         "repo": "services-flake",
-        "rev": "7c0f55c5e4efc06ddaf15945b523d0536ee70c74",
+        "rev": "c663ffebe870fe2592a0e5f5f8551edf2d32c6e5",
         "type": "github"
       },
       "original": {
