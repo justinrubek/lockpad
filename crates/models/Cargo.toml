@@ -4,11 +4,8 @@ version = { workspace = true }
 edition = { workspace = true }
 
 [dependencies]
-aws-sdk-dynamodb = { workspace = true }
 lockpad-derive = { path = "../derive" }
 serde = { workspace = true }
-serde_dynamo = { workspace = true }
-scylla-dynamodb = { path = "../scylla-dynamodb" }
 # serde_json = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
