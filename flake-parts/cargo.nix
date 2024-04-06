@@ -30,7 +30,7 @@
           "examples"
           "Cargo.toml"
           "Cargo.lock"
-          "sqlx-data.json"
+          ".sqlx"
         ];
       };
 

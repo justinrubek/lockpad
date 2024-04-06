@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO \n                users(user_id, identifier, secret)\n            SELECT \n                user_id::uuid, identifier, secret\n            FROM(\n                VALUES($1, $2, $3)\n            ) AS data(user_id, identifier, secret)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "fadd5f5af5c5bfcb9364f188401424af576b80fedc0979739589770ac7a35cf3"
+}
