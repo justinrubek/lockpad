@@ -25,6 +25,10 @@ features = ["use_pem"]
 version = "1"
 features = ["derive"]
 
+[workspace.dependencies.sqlx]
+version = "0.7"
+features = ["runtime-tokio-rustls", "postgres", "time", "macros", "uuid"]
+
 [workspace.dependencies.tokio]
 version = "1"
 features = ["full"]
