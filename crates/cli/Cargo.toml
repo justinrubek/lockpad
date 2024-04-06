@@ -9,11 +9,9 @@ path = "src/main.rs"
 
 [dependencies]
 config = "0.13.3"
-scylla-dynamodb = { path = "../scylla-dynamodb" }
 # clap = { version = "4.0.19", features = ["derive"] }
 # reqwest = { version = "0.11.12", features = ["rustls-tls"] }
 serde = { workspace = true }
-serde_dynamo = { workspace = true }
 serde_json = { workspace = true }
 lockpad-auth = { path = "../auth" }
 lockpad-http = { path = "../http" }
@@ -22,7 +20,6 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = "0.3.16"
 clap = { version = "4.1.6", features = ["derive"] }
-aws-sdk-dynamodb = { workspace = true }
 jsonwebtoken.workspace = true
 rsa = "0.8.2"
 rand = "0.8.5"
