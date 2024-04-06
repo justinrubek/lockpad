@@ -14,7 +14,7 @@ pub mod validation;
 use error::Result;
 use handlers::{
     auth::{authorize, authorize_json, register},
-    pages::{login_screen, register_screen, root},
+    pages::{disabled_register_screen, login_screen, register_screen, root},
     user::{get_user, list_users},
 };
 
@@ -87,6 +87,8 @@ impl Server {
             app = app
                 .route("/forms/register", post(register))
                 .route("/register", get(register_screen));
+        } else {
+            app = app.route("/register", get(disabled_register_screen));
         }
         let app = app.with_state(state).layer(cors);
 

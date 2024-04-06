@@ -70,6 +70,11 @@ pub(crate) async fn register_screen() -> impl IntoResponse {
     }
 }
 
+/// Sends a screen that tells the user that registration is disabled.
+pub(crate) async fn disabled_register_screen() -> impl IntoResponse {
+    HtmlPage::RegisterDisabled
+}
+
 /// A response that sends an HTML page
 enum HtmlPage {
     /// There was no origin provided in the request.
@@ -86,6 +91,8 @@ enum HtmlPage {
     },
     /// The default page
     Default,
+    /// The registration page is disabled
+    RegisterDisabled,
 }
 
 const STYLE: &str = include_str!("style.css");
@@ -139,6 +146,16 @@ impl axum::response::IntoResponse for HtmlPage {
                     a {
                         href: "/register",
                         "sign up"
+                    }
+                }
+            ),
+            HtmlPage::RegisterDisabled => rsx!(
+                div {
+                    class: "container",
+                    h1 { "lockpad" }
+                    p {
+                        text_align: "center",
+                        "Registration is disabled."
                     }
                 }
             ),
