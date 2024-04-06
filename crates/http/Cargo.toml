@@ -6,6 +6,8 @@ edition = { workspace = true }
 [dependencies]
 axum.workspace = true
 aws-sdk-dynamodb = { workspace = true }
+dioxus = { version = "0.5.1", features = ["dioxus-ssr"] }
+dioxus-ssr = "0.5.1"
 hyper = "1.0"
 jsonwebtoken = { workspace = true }
 lockpad-models = { path = "../models" }
@@ -24,4 +26,4 @@ argon2 = { version = "0.4.1", features = ["std"] }
 base64 = "0.21.0"
 sqlx = "0.6.3"
 validator = { version = "0.16.0", features = ["derive"] }
-async-trait = "0.1.68"
+async-trait = "0.1.79"

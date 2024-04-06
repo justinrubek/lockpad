@@ -1,12 +1,12 @@
-use std::str::FromStr;
-
 use axum::{
     extract::{Query, State},
     response::IntoResponse,
 };
+use dioxus::prelude::*;
 use lockpad_models::application::Application;
 use lockpad_ulid::Ulid;
 use serde::Deserialize;
+use std::str::FromStr;
 
 use crate::ServerState;
 
@@ -52,7 +52,10 @@ pub(crate) async fn login_screen(
 
     // TODO: compare the origin to application.allowed_origins
 
-    HtmlPage::Form(HtmlForm::login("/authorize".to_string()))
+    HtmlPage::CredentialsForm {
+        form_type: HtmlFormType::Login,
+        submit_uri: "/login".to_string(),
+    }
 }
 
 /// Sends a screen that asks the user to provide credentials.
@@ -61,7 +64,10 @@ pub(crate) async fn login_screen(
 pub(crate) async fn signup_screen() -> impl IntoResponse {
     // Keep this really simple for now.
     // Later this could be its own dedicated page, but for now it's just a simple form.
-    HtmlPage::Form(HtmlForm::register("/signup".to_string()))
+    HtmlPage::CredentialsForm {
+        form_type: HtmlFormType::Register,
+        submit_uri: "/signup".to_string(),
+    }
 }
 
 /// A response that sends an HTML page
@@ -74,7 +80,10 @@ enum HtmlPage {
     /// The application parameters were invalid.
     InvalidParams,
     /// display a form
-    Form(HtmlForm),
+    CredentialsForm {
+        form_type: HtmlFormType,
+        submit_uri: String,
+    },
     /// The default page
     Default,
 }
@@ -134,7 +143,15 @@ impl axum::response::IntoResponse for HtmlPage {
     "#;
 
         let html = match self {
-            HtmlPage::Form(form) => form.to_string(),
+            HtmlPage::CredentialsForm {
+                form_type,
+                submit_uri,
+            } => dioxus_ssr::render_element(rsx!(
+                login_form {
+                    form_type: form_type,
+                    submit_uri: submit_uri,
+                }
+            )),
             HtmlPage::NoOrigin => {
                 r#"
                 <div class="container">
@@ -199,6 +216,7 @@ impl axum::response::IntoResponse for HtmlPage {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum HtmlFormType {
     /// Allow for user account creation
     Register,
@@ -206,65 +224,39 @@ enum HtmlFormType {
     Login,
 }
 
-/// Represents the html for <form> + <script> tags
-struct HtmlForm {
-    form_type: HtmlFormType,
-    submit_uri: String,
-}
+#[component]
+fn login_form(form_type: HtmlFormType, submit_uri: String) -> Element {
+    let form_name = match form_type {
+        HtmlFormType::Register => "register-form",
+        HtmlFormType::Login => "login-form",
+    };
+    let type_display = match form_type {
+        HtmlFormType::Register => "Sign up",
+        HtmlFormType::Login => "Login",
+    };
 
-impl HtmlForm {
-    fn new(form_type: HtmlFormType, submit_uri: String) -> Self {
-        Self {
-            form_type,
-            submit_uri,
+    rsx!(
+        h1 { {type_display} }
+        form {
+            id: form_name,
+            action: submit_uri,
+            method: "POST",
+            input {
+                r#type: "text",
+                id: "username",
+                name: "username",
+                placeholder: "username",
+            }
+            input {
+                r#type: "password",
+                id: "password",
+                name: "password",
+                placeholder: "password",
+            }
+            input {
+                r#type: "submit",
+                value: type_display,
+            }
         }
-    }
-
-    /// Build a registeration form
-    fn register(submit_uri: String) -> Self {
-        Self::new(HtmlFormType::Register, submit_uri)
-    }
-
-    /// Build a login form
-    fn login(submit_uri: String) -> Self {
-        Self::new(HtmlFormType::Login, submit_uri)
-    }
-}
-
-impl std::string::ToString for HtmlForm {
-    fn to_string(&self) -> String {
-        let type_name = match self.form_type {
-            HtmlFormType::Register => "register",
-            HtmlFormType::Login => "login",
-        };
-
-        let type_display = match self.form_type {
-            HtmlFormType::Register => "Sign up",
-            HtmlFormType::Login => "Login",
-        };
-
-        let submit_uri = &self.submit_uri;
-        let form_name = format!("{}-form", type_name);
-
-        let form_html = format!(
-            r#"
-            <form 
-                id="{form_name}"
-                action="{submit_uri}"
-                method="POST"
-            >
-                <input type="text" id="username" name="username" placeholder="username" />
-                <input type="password" id="password" name="password" placeholder="password" />
-                <input type="submit" value="{type_display}" />
-            </form>
-        "#,
-        );
-
-        format!(
-            r#"
-                <h1>{type_display}</h1>
-                {form_html}
-            "#,
-        )
-    }
+    )
 }
