@@ -160,7 +160,7 @@ OAc5t3RZmw5L0Nikhso62g9oefgwWOIPJwIDAQAB
     #[tokio::test]
     async fn jwks_to_key() -> Result<()> {
         let key_set = PublicKey::parse_from_jwks(JWKS_JSON)?;
-        let key = key_set.get(0).unwrap();
+        let key = key_set.first().unwrap();
 
         // don't validate exp
         let mut validation = jsonwebtoken::Validation::new(Algorithm::RS256);
