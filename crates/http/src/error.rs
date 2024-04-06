@@ -10,34 +10,13 @@ pub enum Error {
     Io(#[from] std::io::Error),
     #[error(transparent)]
     Time(#[from] std::time::SystemTimeError),
-    #[error(transparent)]
-    SerdeDynamo(#[from] serde_dynamo::Error),
 
     #[error(transparent)]
     LockpadModels(#[from] lockpad_models::error::Error),
     #[error(transparent)]
-    LockpadDynamodb(#[from] scylla_dynamodb::error::Error),
-    #[error(transparent)]
     LockpadAuth(#[from] lockpad_auth::error::Error),
     #[error(transparent)]
     LockpadUlid(#[from] lockpad_ulid::error::Error),
-
-    #[error(transparent)]
-    DynamodbQuery(#[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::QueryError>),
-    #[error(transparent)]
-    DynamodbPut(#[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::PutItemError>),
-    #[error(transparent)]
-    DynamodbGet(#[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::GetItemError>),
-    #[error(transparent)]
-    DynamodbDelete(
-        #[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::DeleteItemError>,
-    ),
-    #[error(transparent)]
-    DynamodbUpdate(
-        #[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::UpdateItemError>,
-    ),
-    #[error(transparent)]
-    DynamodbScan(#[from] aws_sdk_dynamodb::types::SdkError<aws_sdk_dynamodb::error::ScanError>),
 
     #[error("Failed to build server struct")]
     ServerBuilder,
