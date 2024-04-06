@@ -19,7 +19,7 @@ For tips on using the provided development environment, see [`HACKING.md`](HACKI
 The authentication service can be ran: `cargo run --bin lockpad-cli server http`.
 You'll need to configure environment variables for:
 
-- DynamoDB connection and table information
+- Postgres connection
 - Secret/public keys
 
 The provided cli can be used to generate keys: `cargo run --bin lockpad-cli -- --help`
