@@ -8,6 +8,14 @@ on:
       repository_name:
         type: string
         description: the container registry name
+  workflow_call:
+    inputs:
+      image_name:
+        type: string
+        description: the package to use for `nix build`
+      repository_name:
+        type: string
+        description: the container registry name
 
 jobs:
   publish-container:

@@ -54,3 +54,10 @@ jobs:
         with:
           body_path: GITHUB_CHANGELOG.md
           tag_name: ${{ steps.get-version.outputs.version }}
+  publish-container:
+    needs: [publish-github]
+    uses: ./.github/workflows/containers.yaml
+    with:
+      image_name: lockpad/docker
+      repository_name: lockpad
+    secrets: inherit
