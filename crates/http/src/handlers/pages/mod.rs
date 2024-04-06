@@ -54,19 +54,19 @@ pub(crate) async fn login_screen(
 
     HtmlPage::CredentialsForm {
         form_type: HtmlFormType::Login,
-        submit_uri: "/authorize".to_string(),
+        submit_uri: "/forms/authorize".to_string(),
     }
 }
 
 /// Sends a screen that asks the user to provide credentials.
 /// These credentials will be used to create a new account.
 /// This closely follows the login screen.
-pub(crate) async fn signup_screen() -> impl IntoResponse {
+pub(crate) async fn register_screen() -> impl IntoResponse {
     // Keep this really simple for now.
     // Later this could be its own dedicated page, but for now it's just a simple form.
     HtmlPage::CredentialsForm {
         form_type: HtmlFormType::Register,
-        submit_uri: "/signup".to_string(),
+        submit_uri: "/forms/register".to_string(),
     }
 }
 
@@ -137,7 +137,7 @@ impl axum::response::IntoResponse for HtmlPage {
                         "log in"
                     }
                     a {
-                        href: "/signup",
+                        href: "/register",
                         "sign up"
                     }
                 }
