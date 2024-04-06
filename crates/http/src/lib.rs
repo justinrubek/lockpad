@@ -27,6 +27,8 @@ pub struct Server {
     jwt_secret: Vec<u8>,
     /// The public key used to verify the JWT tokens.
     jwt_public: Vec<u8>,
+
+    disable_signup: bool,
 }
 
 #[derive(Clone)]
@@ -58,13 +60,11 @@ impl Server {
             public_key,
         };
 
-        let app = Router::new()
+        let mut app = Router::new()
             .route("/", get(root))
             .route("/login", get(login_screen))
-            .route("/signup-screen", get(signup_screen))
             .route("/authorize", post(authorize))
             .route("/api/authorize", post(authorize_json))
-            .route("/signup", post(register))
             .route("/users", get(list_users))
             .route("/users/:user_id", get(get_user))
             .route(
@@ -82,9 +82,13 @@ impl Server {
             )
             .route("/api-keys/:api_key_id", get(handlers::api_key::get_api_key))
             .route("/.well-known/jwks.json", get(handlers::jwks::jwks))
-            .route("/health", get(handlers::health::health))
-            .with_state(state)
-            .layer(cors);
+            .route("/health", get(handlers::health::health));
+        if !self.disable_signup {
+            app = app
+                .route("/signup", post(register))
+                .route("/signup-screen", get(signup_screen));
+        }
+        let app = app.with_state(state).layer(cors);
 
         tracing::info!("Listening on {0}", self.addr);
         let listener = TcpListener::bind(&self.addr).await?;
@@ -99,6 +103,7 @@ pub struct Builder {
     pg_pool: Option<sqlx::pool::Pool<sqlx::Postgres>>,
     jwt_secret: Option<Vec<u8>>,
     jwt_public: Option<Vec<u8>>,
+    disable_signup: Option<bool>,
 }
 
 impl Builder {
@@ -108,6 +113,7 @@ impl Builder {
             pg_pool: None,
             jwt_secret: None,
             jwt_public: None,
+            disable_signup: None,
         }
     }
 
@@ -131,17 +137,24 @@ impl Builder {
         self
     }
 
+    pub fn disable_signup(mut self, disable_signup: bool) -> Self {
+        self.disable_signup = Some(disable_signup);
+        self
+    }
+
     pub fn build(self) -> Result<Server> {
         let addr = self.addr.ok_or(error::Error::ServerBuilder)?;
         let pg_pool = self.pg_pool.ok_or(error::Error::ServerBuilder)?;
         let jwt_secret = self.jwt_secret.ok_or(error::Error::ServerBuilder)?;
         let jwt_public = self.jwt_public.ok_or(error::Error::ServerBuilder)?;
+        let disable_signup = self.disable_signup.unwrap_or(false);
 
         Ok(Server {
             addr,
             pg_pool,
             jwt_secret,
             jwt_public,
+            disable_signup,
         })
     }
 }
@@ -153,6 +166,7 @@ impl Default for Builder {
             pg_pool: None,
             jwt_secret: None,
             jwt_public: None,
+            disable_signup: None,
         }
     }
 }

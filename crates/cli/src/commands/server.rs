@@ -29,6 +29,7 @@ impl ServerCommand {
             .pg_pool(pg_pool)
             .jwt_secret(config.secret_key.as_bytes().to_owned())
             .jwt_public(config.public_key.as_bytes().to_owned())
+            .disable_signup(config.disable_signup)
             .build()?;
 
         match self.command {
