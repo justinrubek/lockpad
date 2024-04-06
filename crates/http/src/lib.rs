@@ -14,7 +14,7 @@ pub mod validation;
 use error::Result;
 use handlers::{
     auth::{authorize, authorize_json, register},
-    pages::{login_screen, root, signup_screen},
+    pages::{login_screen, register_screen, root},
     user::{get_user, list_users},
 };
 
@@ -63,7 +63,7 @@ impl Server {
         let mut app = Router::new()
             .route("/", get(root))
             .route("/login", get(login_screen))
-            .route("/authorize", post(authorize))
+            .route("/forms/authorize", post(authorize))
             .route("/api/authorize", post(authorize_json))
             .route("/users", get(list_users))
             .route("/users/:user_id", get(get_user))
@@ -85,8 +85,8 @@ impl Server {
             .route("/health", get(handlers::health::health));
         if !self.disable_signup {
             app = app
-                .route("/signup", post(register))
-                .route("/signup-screen", get(signup_screen));
+                .route("/forms/register", post(register))
+                .route("/register", get(register_screen));
         }
         let app = app.with_state(state).layer(cors);
 
