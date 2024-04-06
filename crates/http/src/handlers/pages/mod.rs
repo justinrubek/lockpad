@@ -54,7 +54,7 @@ pub(crate) async fn login_screen(
 
     HtmlPage::CredentialsForm {
         form_type: HtmlFormType::Login,
-        submit_uri: "/login".to_string(),
+        submit_uri: "/authorize".to_string(),
     }
 }
 
