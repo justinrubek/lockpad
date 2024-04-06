@@ -92,79 +92,63 @@ const STYLE: &str = include_str!("style.css");
 
 impl axum::response::IntoResponse for HtmlPage {
     fn into_response(self) -> axum::response::Response {
-        let common_html = format!("<style>{STYLE}</style>");
-
-        let html = match self {
+        let body = match self {
             HtmlPage::CredentialsForm {
                 form_type,
                 submit_uri,
-            } => dioxus_ssr::render_element(rsx!(
-                login_form {
-                    form_type: form_type,
-                    submit_uri: submit_uri,
+            } => rsx!(login_form {
+                form_type: form_type,
+                submit_uri: submit_uri,
+            }),
+            HtmlPage::NoOrigin => rsx!(
+                div {
+                    class: "container",
+                    h1 { "log in" }
+                    p {
+                        r#"If you are seeing this page, it means you have arrived here by accident.
+                        Your request did not include an origin header, which is required for security reasons."#
+                    }
                 }
-            )),
-            HtmlPage::NoOrigin => {
-                r#"
-                <div class="container">
-                    <h1>log in</h1>
-                    <p>
-                        If you are seeing this page, it means you have arrived here by accident.
-                        Your request did not include an origin header, which is required for security reasons.
-                    </p>
-                </div>
-            "#.to_string()
-            }
-            HtmlPage::NoParams => {
-                r#"
-                <div class="container">
-                    <h1>log in</h1>
-                    <p>
-                    If you are seeing this page, it means that you have been directed here by an application that is trying to log you in.
-                    However, the application did not provide the necessary parameters to complete the login process.
-                    The application needs to provide the following parameters:
-                    </p>
-                    <ul>
-                        <li><strong>redirect_uri</strong></li>
-                        <li><strong>client_id</strong></li>
-                    </ul>
-                    <p>
-                    Without this information, the login page has no way of knowing where to redirect you after you have logged in.
-                    </p>
-                </div>
-            "#.to_string()
-            }
-            HtmlPage::InvalidParams => {
-                r#"
-                <div class="container">
-                    <h1>log in</h1>
-                    <p>
-                    If you are seeing this page, it means that you have been directed here by an application that is trying to log you in.
-                    However, the application did not provide the necessary parameters to complete the login process.
-                    The application needs to provide the following parameters:
-                    </p>
-                    <ul>
-                        <li><strong>redirect_uri</strong></li>
-                        <li><strong>client_id</strong></li>
-                    </ul>
-                    <p>
-                    Without this information, the login page has no way of knowing where to redirect you after you have logged in.
-                    </p>
-                </div>
-            "#.to_string()
-            }
-            HtmlPage::Default => {
-                r#"
-                    <div class="container">
-                        <h1>lockpad</h1>
-                        <a href="/login">log in</a>
-                        <a href="/signup">sign up</a>
-                    </div>
-                "#.to_string()
-            }
+            ),
+            HtmlPage::NoParams | HtmlPage::InvalidParams => rsx!(
+                div {
+                    class: "container",
+                    h1 { "log in" }
+                    p {
+                        r#"If you are seeing this page, it that you have been directed here by an application that is trying to log you in.
+                        However, the application did not provide the necessary parameters to complete the login process.
+                        The application needs to provide the following parameters:"#
+                    }
+                    ul {
+                        li { strong { "redirect_uri" } }
+                        li { strong { "client_id" } }
+                    }
+                    p {
+                        "Without this information, the login page has no way of knowing where to redirect you after you have logged in."
+                    }
+                }
+            ),
+            HtmlPage::Default => rsx!(
+                div {
+                    class: "container",
+                    h1 { "lockpad" }
+                    a {
+                        href: "/login",
+                        "log in"
+                    }
+                    a {
+                        href: "/signup",
+                        "sign up"
+                    }
+                }
+            ),
         };
 
-        axum::response::Html(format!("{}{}", common_html, html)).into_response()
+        let rendered = dioxus_ssr::render_element(rsx!(
+            style { {STYLE} }
+            {body}
+        ));
+        axum::response::Html(rendered).into_response()
     }
 }
 
