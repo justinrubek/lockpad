@@ -22,6 +22,39 @@ All notable changes to this project will be documented in this file. See [conven
 - convert user model to postgres - ([330a9e0](https://github.com/justinrubek/lockpad/commit/330a9e0e83cd34d0021688221ce2a0e83aec2981)) - [@justinrubek](https://github.com/justinrubek)
 
 - - -
+## [0.4.0](https://github.com/justinrubek/lockpad/compare/0.3.0..0.4.0) - 2024-04-06
+#### Bug Fixes
+- **(cargo)** clippy issue - ([8e02e81](https://github.com/justinrubek/lockpad/commit/8e02e819ffbfb97e5f7551c9540e7b29244015fe)) - [@justinrubek](https://github.com/justinrubek)
+#### Build system
+- **(cargo)** sqlx 0.6.3 -> 0.7 - ([7f52807](https://github.com/justinrubek/lockpad/commit/7f52807fb62f14a69f85ea34256381550a9b7863)) - [@justinrubek](https://github.com/justinrubek)
+- **(cargo)** cargo update - ([ae744ea](https://github.com/justinrubek/lockpad/commit/ae744ea8bad3bcdadfd2257b65ab2cefd6f3a8eb)) - [@justinrubek](https://github.com/justinrubek)
+- **(cargo)** update reqwest - ([a2cf920](https://github.com/justinrubek/lockpad/commit/a2cf920510ef417869252b02f61ef0ce850fa5f0)) - [@justinrubek](https://github.com/justinrubek)
+- **(deps)** bump h2 from 0.3.21 to 0.3.26 - ([c300255](https://github.com/justinrubek/lockpad/commit/c300255cb318448dc4ae0298fd29dccc7d9bde77)) - dependabot[bot]
+- **(deps)** bump whoami from 1.4.1 to 1.5.1 - ([7536325](https://github.com/justinrubek/lockpad/commit/75363255c2f6b6cbfd6e4a352244a39c9bc4f64f)) - dependabot[bot]
+- **(deps)** bump mio from 0.8.8 to 0.8.11 - ([f8ae128](https://github.com/justinrubek/lockpad/commit/f8ae1286f3f17f98839a3437df46d58c8f868bcb)) - dependabot[bot]
+- **(nix)** update fenix import - ([32ac1d4](https://github.com/justinrubek/lockpad/commit/32ac1d49287b59aeb38b3085127cf40f7fadbc22)) - [@justinrubek](https://github.com/justinrubek)
+- **(nix)** update service-flake - ([b9e65e2](https://github.com/justinrubek/lockpad/commit/b9e65e26bb3626f46b70625416cad4584f1e76c6)) - [@justinrubek](https://github.com/justinrubek)
+#### Continuous Integration
+- **(github/actions)** trigger container build after release - ([b63fa40](https://github.com/justinrubek/lockpad/commit/b63fa40db30e033a5a444c981a729a44ea29ab69)) - [@justinrubek](https://github.com/justinrubek)
+- **(github/actions)** add github release on tag - ([b61d39d](https://github.com/justinrubek/lockpad/commit/b61d39d4dccb5ba1a7cf2f124097a778cf278bdf)) - [@justinrubek](https://github.com/justinrubek)
+#### Documentation
+- **(readme)** remove dynamo information - ([bd3dd35](https://github.com/justinrubek/lockpad/commit/bd3dd355943758c92b5817724a3d4f25f14dd611)) - [@justinrubek](https://github.com/justinrubek)
+#### Features
+- **(http)** display separate register page when signup is disabled - ([e33f9d0](https://github.com/justinrubek/lockpad/commit/e33f9d027f4e174fac3d13d0e4c566c8d6a89c69)) - [@justinrubek](https://github.com/justinrubek)
+- optionally disable signups - ([928712b](https://github.com/justinrubek/lockpad/commit/928712bfc7e0543ed885689f55a8089f86a79e07)) - [@justinrubek](https://github.com/justinrubek)
+#### Miscellaneous Chores
+- **(cargo/http)** move `pages` module into separate directory - ([4cef461](https://github.com/justinrubek/lockpad/commit/4cef4614b9da893f04e6c913b2a1092d92f65fb6)) - [@justinrubek](https://github.com/justinrubek)
+- remove `derive` crate - ([ac8662a](https://github.com/justinrubek/lockpad/commit/ac8662ae614b979f473f1d7db0e1ed60b5f7062d)) - [@justinrubek](https://github.com/justinrubek)
+#### Refactoring
+- **(http)** change route structure for signup - ([93c1827](https://github.com/justinrubek/lockpad/commit/93c1827441facb8c7e9a3e16140217f3e5a488df)) - [@justinrubek](https://github.com/justinrubek)
+- **(http)** use dioxus for all html generation - ([16fbe8c](https://github.com/justinrubek/lockpad/commit/16fbe8c089a5152c68651fc532d52a10f7ac7cc6)) - [@justinrubek](https://github.com/justinrubek)
+- **(http)** split style into separate file - ([33782b4](https://github.com/justinrubek/lockpad/commit/33782b434714b8fdc438d2ec49fe0fd1efbf12c4)) - [@justinrubek](https://github.com/justinrubek)
+- **(http)** rewrite form using dioxus - ([a329ccb](https://github.com/justinrubek/lockpad/commit/a329ccb3998d65fc66ca5494781c143a45c3c998)) - [@justinrubek](https://github.com/justinrubek)
+- **(postgres)** use nix-postgres package - ([8737c4f](https://github.com/justinrubek/lockpad/commit/8737c4f7576502f073d7f25e9fe6eda8a51dc3c7)) - [@justinrubek](https://github.com/justinrubek)
+- remove dynamodb - ([ca2c6f8](https://github.com/justinrubek/lockpad/commit/ca2c6f889869dbf5a1a7e7db754d8ae0166e72a0)) - [@justinrubek](https://github.com/justinrubek)
+
+- - -
+
 ## [0.3.0](https://github.com/justinrubek/lockpad/compare/0.2.0..0.3.0) - 2024-02-29
 #### Build system
 - **(cargo)** update axum to 0.7 - ([c9cd7fa](https://github.com/justinrubek/lockpad/commit/c9cd7fa3d9f03b707a092cd061f7d430aa5e52e5)) - [@justinrubek](https://github.com/justinrubek)

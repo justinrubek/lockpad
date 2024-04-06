@@ -988,7 +988,7 @@ dependencies = [
 
 [[package]]
 name = "example-custom-extraction"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "axum",
  "lockpad-auth",
@@ -1002,7 +1002,7 @@ dependencies = [
 
 [[package]]
 name = "example-simple"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "axum",
  "lockpad-auth",
@@ -1626,7 +1626,7 @@ dependencies = [
 
 [[package]]
 name = "lockpad"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "clap",
  "config",
@@ -1646,7 +1646,7 @@ dependencies = [
 
 [[package]]
 name = "lockpad-auth"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "axum",
  "axum-extra",
@@ -1662,7 +1662,7 @@ dependencies = [
 
 [[package]]
 name = "lockpad-http"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "argon2",
  "async-trait",
@@ -1688,7 +1688,7 @@ dependencies = [
 
 [[package]]
 name = "lockpad-models"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "lockpad-ulid",
  "serde",
@@ -1701,7 +1701,7 @@ dependencies = [
 
 [[package]]
 name = "lockpad-ulid"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "rusty_ulid",
