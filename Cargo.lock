@@ -1617,14 +1617,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lockpad-derive"
-version = "0.3.0"
-dependencies = [
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
 name = "lockpad-http"
 version = "0.3.0"
 dependencies = [
@@ -1654,7 +1646,6 @@ dependencies = [
 name = "lockpad-models"
 version = "0.3.0"
 dependencies = [
- "lockpad-derive",
  "lockpad-ulid",
  "serde",
  "serde_json",
