@@ -54,7 +54,7 @@ pub(crate) async fn login_screen(
 
     HtmlPage::CredentialsForm {
         form_type: HtmlFormType::Login,
-        submit_uri: "/login".to_string(),
+        submit_uri: "/authorize".to_string(),
     }
 }
 
@@ -88,59 +88,11 @@ enum HtmlPage {
     Default,
 }
 
+const STYLE: &str = include_str!("style.css");
+
 impl axum::response::IntoResponse for HtmlPage {
     fn into_response(self) -> axum::response::Response {
-        let common_html = r#"
-        <style>
-            .container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            h1 {
-                text-align: center;
-            }
-
-            p {
-                width: 500px;
-            }
-
-            ul {
-                width: 500px;
-            }
-
-            li {
-                margin: 0.5rem;
-            }
-
-            li strong {
-                font-weight: bold;
-            }
-
-            form {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            input {
-                margin: 0.5rem;
-            }
-
-            input[type="submit"] {
-                width: 100px;
-            }
-
-            input[type="text"], input[type="password"] {
-                width: 200px;
-            }
-
-            input[type="text"]:focus, input[type="password"]:focus {
-                outline: none;
-            }
-        </style>
-    "#;
+        let common_html = format!("<style>{STYLE}</style>");
 
         let html = match self {
             HtmlPage::CredentialsForm {
