@@ -10,5 +10,5 @@ thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 lockpad-ulid = { path = "../ulid" }
-sqlx = { version = "0.6.3", features = ["offline", "runtime-tokio-rustls", "postgres", "time", "macros", "uuid"] }
+sqlx = { workspace = true }
 serde_json.workspace = true

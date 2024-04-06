@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                user_id::uuid as \"user_id: Ulid\", identifier, secret\n            FROM \n                users\n            WHERE \n                identifier = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id: Ulid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "identifier",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "secret",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      null,
+      false,
+      false
+    ]
+  },
+  "hash": "9cce7d736639343ea8c812be33947abeac7449035c2e2a72fd744bbe778700b9"
+}

@@ -1,0 +1,44 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                user_id as \"user_id: Ulid\", identifier, secret\n            FROM \n                users\n            WHERE \n                user_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id: Ulid",
+        "type_info": {
+          "Custom": {
+            "name": "ulid",
+            "kind": "Simple"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "identifier",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "secret",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        {
+          "Custom": {
+            "name": "ulid",
+            "kind": "Simple"
+          }
+        }
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "ada9aec09600b0a7d0b12f0ece47e10ff0a4c0096695cd2c0039dd3ea3317991"
+}

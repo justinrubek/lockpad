@@ -1,0 +1,44 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                application_id::uuid as \"application_id: Ulid\",\n                owner_id::uuid as \"owner_id: Ulid\",\n                name,\n                allowed_origins,\n                allowed_callback_urls\n            FROM \n                applications\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "application_id: Ulid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "owner_id: Ulid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "allowed_origins",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 4,
+        "name": "allowed_callback_urls",
+        "type_info": "TextArray"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "45b7f0c08c50bdd318ff30690635e079b1e6f457267903f134e9186f12650c04"
+}
