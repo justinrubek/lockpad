@@ -39,6 +39,7 @@
       imports = [
         inputs.pre-commit-hooks.flakeModule
 
+        ./flake-parts/bomper.nix
         ./flake-parts/shells.nix
         ./flake-parts/ci.nix
 
